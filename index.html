@@ -320,6 +320,25 @@
 
     .fw-close:hover { background: rgba(255, 70, 70, 0.45); color: #fff; }
 
+    .fw-open {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+      line-height: 1;
+    }
+    .fw-open:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
     /* per-frame device picker */
     .fw-devs { display: flex; gap: 2px; flex-shrink: 0; }
     .fw-devs button {
@@ -618,6 +637,9 @@
 <!-- Grid canvas -->
 <canvas id="bg-canvas"></canvas>
 
+<!-- Tooltip -->
+<div id="tooltip"></div>
+
 <!-- Toggle pill -->
 <button id="bar-toggle" title="Mostrar/ocultar barra (H)">
   <i class="arrow">▲</i> <span id="bar-toggle-label">OCULTAR</span>
@@ -885,12 +907,25 @@ function buildFrame(data) {
     devStrip.appendChild(b);
   });
 
+  const openBtn = document.createElement('a');
+  openBtn.className = 'fw-open';
+  openBtn.title = 'Abrir en nueva pestaña';
+  openBtn.innerHTML = '&#8599;';
+  openBtn.setAttribute('target', '_blank');
+  openBtn.setAttribute('rel', 'noopener noreferrer');
+  /* for YouTube show the watch URL, otherwise use the raw url */
+  try {
+    const ytId2 = new URL(url).pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
+    openBtn.href = ytId2 ? `https://www.youtube.com/watch?v=${ytId2[1]}` : url;
+  } catch { openBtn.href = url; }
+  openBtn.addEventListener('click', e => e.stopPropagation());
+
   const closeBtn = document.createElement('button');
   closeBtn.className = 'fw-close';
   closeBtn.innerHTML = '✕';
   closeBtn.title = 'Cerrar';
   closeBtn.addEventListener('click', e => { e.stopPropagation(); removeFrame(id); });
-  label.append(title, devStrip, closeBtn);
+  label.append(title, openBtn, devStrip, closeBtn);
 
   /* iframe */
   const iframe = document.createElement('iframe');
@@ -1055,14 +1090,11 @@ function buildFrame(data) {
 let _fsFrame = null;
 let _fsPrevT  = null;   // saved transform to restore
 
-const hintsEl = document.getElementById('hints');
-
 function enterFs(fw, data) {
   if (_fsFrame) exitFs();
 
   _fsPrevT  = { x: T.x, y: T.y, s: T.s };
   _fsFrame  = fw;
-  hintsEl.style.display = 'none';
 
   const dev        = DEVICES[data.device] || DEVICES.mobile;
   const frameW     = dev.outerW;
@@ -1097,7 +1129,6 @@ function exitFs() {
   _fsPrevT = null;
   applyT();
   saveState();
-  hintsEl.style.display = '';
 }
 
 /* Escape exits zoom-to-fit */
@@ -1110,7 +1141,7 @@ window.addEventListener('keydown', e => {
 ===================================================================== */
 vp.addEventListener('mousedown', e => {
   /* ignore clicks on interactive children */
-  if (e.target.closest('.fw-label, .fw-close, .fw-devs, #url-input, #add-btn, .z-btn, .blocked-link')) return;
+  if (e.target.closest('.fw-label, .fw-close, .fw-open, .fw-devs, #url-input, #add-btn, .z-btn, .blocked-link')) return;
   if (e.button === 1 || (e.button === 0 && spaceDown)) {
     e.preventDefault();
     panning = true;
@@ -1142,14 +1173,12 @@ window.addEventListener('mouseup', () => {
     panning = false;
     vp.style.cursor = spaceDown ? 'grab' : '';
     saveState();
-    if (!_fsFrame) hintsEl.style.display = '';
   }
   if (dragging) {
     dragging = null;
     world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
     document.body.style.userSelect = '';
     saveState();
-    if (!_fsFrame) hintsEl.style.display = '';
   }
 });
 
@@ -1234,6 +1263,132 @@ document.querySelectorAll('.dev-btn').forEach(btn => {
 document.getElementById('z-in' ).addEventListener('click', () => { zoomTo(T.s * 1.2); saveState(); });
 document.getElementById('z-out').addEventListener('click', () => { zoomTo(T.s / 1.2); saveState(); });
 document.getElementById('z-fit').addEventListener('click', () => { resetView();        saveState(); });
+
+/* =====================================================================
+   Custom tooltips
+===================================================================== */
+(function () {
+  const tip  = document.getElementById('tooltip');
+  let current = null;
+  let showTimer = null;
+
+  function show(el, x, y) {
+    const text = el.dataset.tip;
+    if (!text) return;
+    tip.textContent = text;
+    position(x, y);
+    tip.classList.add('visible');
+  }
+
+  function position(x, y) {
+    const pad = 12;
+    tip.style.left = '0';
+    tip.style.top  = '0';
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    let lx = x + pad;
+    let ly = y - th - pad;
+    if (lx + tw > innerWidth  - 8) lx = x - tw - pad;
+    if (ly < 8) ly = y + pad;
+    tip.style.left = lx + 'px';
+    tip.style.top  = ly + 'px';
+  }
+
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest('[title],[data-tip]');
+    if (!el) return;
+    /* move native title to data-tip to suppress browser tooltip */
+    if (el.hasAttribute('title')) {
+      el.dataset.tip = el.getAttribute('title');
+      el.removeAttribute('title');
+    }
+    if (current === el) return;
+    current = el;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(() => show(el, e.clientX, e.clientY), 300);
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!current) return;
+    position(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseout', e => {
+    if (!e.target.closest('[data-tip]')) return;
+    clearTimeout(showTimer);
+    tip.classList.remove('visible');
+    current = null;
+  });
+
+  document.addEventListener('mousedown', () => {
+    clearTimeout(showTimer);
+    tip.classList.remove('visible');
+    current = null;
+  });
+})();
+
+/* =====================================================================
+   Custom tooltips
+===================================================================== */
+(function () {
+  const tip  = document.getElementById('tooltip');
+  let current  = null;
+  let showTimer = null;
+
+  function show(el, x, y) {
+    const text = el.dataset.tip;
+    if (!text) return;
+    tip.textContent = text;
+    position(x, y);
+    tip.classList.add('visible');
+  }
+
+  function position(x, y) {
+    const pad = 12;
+    tip.style.left = '0';
+    tip.style.top  = '0';
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    let lx = x + pad;
+    let ly = y - th - pad;
+    if (lx + tw > innerWidth  - 8) lx = x - tw - pad;
+    if (ly < 8) ly = y + pad;
+    tip.style.left = lx + 'px';
+    tip.style.top  = ly + 'px';
+  }
+
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest('[title],[data-tip]');
+    if (!el) return;
+    /* move native title → data-tip to suppress browser tooltip */
+    if (el.hasAttribute('title')) {
+      el.dataset.tip = el.getAttribute('title');
+      el.removeAttribute('title');
+    }
+    if (current === el) return;
+    current = el;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(() => show(el, e.clientX, e.clientY), 300);
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!current) return;
+    position(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseout', e => {
+    if (!e.target.closest('[data-tip]')) return;
+    clearTimeout(showTimer);
+    tip.classList.remove('visible');
+    current = null;
+  });
+
+  document.addEventListener('mousedown', () => {
+    clearTimeout(showTimer);
+    tip.classList.remove('visible');
+    current = null;
+  });
+})();
 
 /* =====================================================================
    Resize + init
