@@ -1055,11 +1055,14 @@ function buildFrame(data) {
 let _fsFrame = null;
 let _fsPrevT  = null;   // saved transform to restore
 
+const hintsEl = document.getElementById('hints');
+
 function enterFs(fw, data) {
   if (_fsFrame) exitFs();
 
   _fsPrevT  = { x: T.x, y: T.y, s: T.s };
   _fsFrame  = fw;
+  hintsEl.style.display = 'none';
 
   const dev        = DEVICES[data.device] || DEVICES.mobile;
   const frameW     = dev.outerW;
@@ -1094,6 +1097,7 @@ function exitFs() {
   _fsPrevT = null;
   applyT();
   saveState();
+  hintsEl.style.display = '';
 }
 
 /* Escape exits zoom-to-fit */
@@ -1138,12 +1142,14 @@ window.addEventListener('mouseup', () => {
     panning = false;
     vp.style.cursor = spaceDown ? 'grab' : '';
     saveState();
+    if (!_fsFrame) hintsEl.style.display = '';
   }
   if (dragging) {
     dragging = null;
     world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
     document.body.style.userSelect = '';
     saveState();
+    if (!_fsFrame) hintsEl.style.display = '';
   }
 });
 
@@ -1233,7 +1239,68 @@ document.getElementById('z-fit').addEventListener('click', () => { resetView(); 
    Resize + init
 ===================================================================== */
 window.addEventListener('resize', drawGrid);
-if (!loadState()) resetView();
+
+/* =====================================================================
+   Config.json — defaults when there is no saved session
+===================================================================== */
+async function loadConfig() {
+  try {
+    const res = await fetch('./config.json');
+    if (!res.ok) return;
+    const cfg = await res.json();
+
+    /* menu visibility */
+    if (cfg.menu === 'oculto') {
+      document.body.classList.add('bar-hidden');
+      barToggleLbl.textContent = 'MOSTRAR';
+      localStorage.setItem('bar_hidden', '1');
+    }
+
+    const urls   = Array.isArray(cfg.urlsInicial) ? cfg.urlsInicial : [];
+    const cfgDev = (cfg.device && DEVICES[cfg.device]) ? cfg.device : 'monitor';
+    if (!urls.length) return;
+
+    if (urls.length === 1) {
+      /* single URL → add in configured device then zoom-to-fit */
+      const savedDev = selectedDevice;
+      selectedDevice = cfgDev;
+      addFrame(urls[0]);
+      selectedDevice = savedDev;
+      const frameData = frames[frames.length - 1];
+      const fw = document.getElementById('fw-' + frameData.id);
+      if (fw && frameData) enterFs(fw, frameData);
+    } else {
+      /* multiple URLs → configured device, arranged side by side */
+      const GAP = 40;
+      const dev = DEVICES[cfgDev];
+      urls.forEach((url, i) => {
+        const normalized = normalizeUrl(url);
+        if (!normalized) return;
+        const id   = idSeq++;
+        const data = { id, url: normalized, device: cfgDev,
+                        x: i * (dev.outerW + GAP), y: 0 };
+        frames.push(data);
+        buildFrame(data);
+      });
+      if (frames.length) emptyEl.classList.add('hidden');
+      /* center canvas to show all frames */
+      const totalW = frames.length * (dev.outerW + GAP) - GAP;
+      T.s = Math.min(1, (innerWidth * 0.9) / totalW);
+      T.x = (innerWidth  - totalW * T.s) / 2;
+      T.y = (innerHeight - dev.outerH * T.s) / 2;
+      applyT();
+      saveState();
+    }
+  } catch (err) {
+    console.warn('config.json no encontrado o inválido', err);
+  }
+}
+
+const _hasSavedState = loadState();
+if (!_hasSavedState) {
+  resetView();
+  loadConfig();
+}
 
 /* restore bar visibility */
 if (localStorage.getItem('bar_hidden') === '1') {
