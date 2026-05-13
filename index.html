@@ -178,6 +178,25 @@
     #add-btn:hover  { background: #7592ff; }
     #add-btn:active { transform: scale(0.9); }
 
+    #reset-btn {
+      flex-shrink: 0;
+      width: 34px;
+      height: 38px;
+      border-radius: 7px;
+      background: #5c7dff;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+    }
+    #reset-btn:hover  { background: #7592ff; }
+    #reset-btn:active { transform: scale(0.9); }
+
     /* Zoom strip */
     .zoom-strip {
       display: flex;
@@ -630,6 +649,25 @@
       font-family: inherit;
       font-size: 10px;
     }
+
+    /* ── Tooltip ──────────────────────────────────────────────── */
+    #tooltip {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      background: rgba(30, 30, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 11.5px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.12s;
+      backdrop-filter: blur(8px);
+    }
+    #tooltip.visible { opacity: 1; }
   </style>
 </head>
 <body>
@@ -657,9 +695,10 @@
     <button class="z-btn" id="z-out" title="Alejar  (Ctrl −)">−</button>
     <span id="zoom-label">100%</span>
     <button class="z-btn" id="z-in"  title="Acercar (Ctrl +)">+</button>
-    <button class="z-btn" id="z-fit" title="Restablecer (Ctrl 0)"
+    <button class="z-btn" id="z-fit" title="Restablecer vista (Ctrl 0)"
             style="font-size:10px;width:auto;padding:0 7px">1:1</button>
   </div>
+  <button id="reset-btn" title="Reiniciar dashboard">↺</button>
 </div>
 <div id="viewport">
   <div id="world"></div>
@@ -1268,36 +1307,34 @@ document.getElementById('z-fit').addEventListener('click', () => { resetView(); 
    Custom tooltips
 ===================================================================== */
 (function () {
-  const tip  = document.getElementById('tooltip');
-  let current = null;
+  const tip = document.getElementById('tooltip');
+  let current   = null;
   let showTimer = null;
 
-  function show(el, x, y) {
+  function show(el) {
     const text = el.dataset.tip;
     if (!text) return;
     tip.textContent = text;
-    position(x, y);
-    tip.classList.add('visible');
-  }
-
-  function position(x, y) {
-    const pad = 12;
+    /* position centered above the element */
     tip.style.left = '0';
     tip.style.top  = '0';
-    const tw = tip.offsetWidth;
-    const th = tip.offsetHeight;
-    let lx = x + pad;
-    let ly = y - th - pad;
-    if (lx + tw > innerWidth  - 8) lx = x - tw - pad;
-    if (ly < 8) ly = y + pad;
+    const rect = el.getBoundingClientRect();
+    const tw   = tip.offsetWidth;
+    const th   = tip.offsetHeight;
+    const gap  = 8;
+    let lx = rect.left + rect.width / 2;   /* center X (tip uses translateX(-50%)) */
+    let ly = rect.top - th - gap;
+    if (ly < 8) ly = rect.bottom + gap;    /* flip below if no room above */
+    if (lx - tw / 2 < 8) lx = tw / 2 + 8;
+    if (lx + tw / 2 > innerWidth - 8) lx = innerWidth - tw / 2 - 8;
     tip.style.left = lx + 'px';
     tip.style.top  = ly + 'px';
+    tip.classList.add('visible');
   }
 
   document.addEventListener('mouseover', e => {
     const el = e.target.closest('[title],[data-tip]');
     if (!el) return;
-    /* move native title to data-tip to suppress browser tooltip */
     if (el.hasAttribute('title')) {
       el.dataset.tip = el.getAttribute('title');
       el.removeAttribute('title');
@@ -1305,16 +1342,12 @@ document.getElementById('z-fit').addEventListener('click', () => { resetView(); 
     if (current === el) return;
     current = el;
     clearTimeout(showTimer);
-    showTimer = setTimeout(() => show(el, e.clientX, e.clientY), 300);
-  });
-
-  document.addEventListener('mousemove', e => {
-    if (!current) return;
-    position(e.clientX, e.clientY);
+    showTimer = setTimeout(() => show(el), 320);
   });
 
   document.addEventListener('mouseout', e => {
-    if (!e.target.closest('[data-tip]')) return;
+    const el = e.target.closest('[data-tip]');
+    if (!el) return;
     clearTimeout(showTimer);
     tip.classList.remove('visible');
     current = null;
@@ -1328,67 +1361,25 @@ document.getElementById('z-fit').addEventListener('click', () => { resetView(); 
 })();
 
 /* =====================================================================
-   Custom tooltips
+   Reset button
 ===================================================================== */
-(function () {
-  const tip  = document.getElementById('tooltip');
-  let current  = null;
-  let showTimer = null;
-
-  function show(el, x, y) {
-    const text = el.dataset.tip;
-    if (!text) return;
-    tip.textContent = text;
-    position(x, y);
-    tip.classList.add('visible');
-  }
-
-  function position(x, y) {
-    const pad = 12;
-    tip.style.left = '0';
-    tip.style.top  = '0';
-    const tw = tip.offsetWidth;
-    const th = tip.offsetHeight;
-    let lx = x + pad;
-    let ly = y - th - pad;
-    if (lx + tw > innerWidth  - 8) lx = x - tw - pad;
-    if (ly < 8) ly = y + pad;
-    tip.style.left = lx + 'px';
-    tip.style.top  = ly + 'px';
-  }
-
-  document.addEventListener('mouseover', e => {
-    const el = e.target.closest('[title],[data-tip]');
-    if (!el) return;
-    /* move native title → data-tip to suppress browser tooltip */
-    if (el.hasAttribute('title')) {
-      el.dataset.tip = el.getAttribute('title');
-      el.removeAttribute('title');
-    }
-    if (current === el) return;
-    current = el;
-    clearTimeout(showTimer);
-    showTimer = setTimeout(() => show(el, e.clientX, e.clientY), 300);
-  });
-
-  document.addEventListener('mousemove', e => {
-    if (!current) return;
-    position(e.clientX, e.clientY);
-  });
-
-  document.addEventListener('mouseout', e => {
-    if (!e.target.closest('[data-tip]')) return;
-    clearTimeout(showTimer);
-    tip.classList.remove('visible');
-    current = null;
-  });
-
-  document.addEventListener('mousedown', () => {
-    clearTimeout(showTimer);
-    tip.classList.remove('visible');
-    current = null;
-  });
-})();
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (!confirm('¿Reiniciar el dashboard? Se perderá el estado actual.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem('bar_hidden');
+  /* clear current frames */
+  frames.forEach(f => document.getElementById('fw-' + f.id)?.remove());
+  frames = [];
+  idSeq  = 1;
+  _fsFrame = null;
+  _fsPrevT = null;
+  emptyEl.classList.remove('hidden');
+  /* restore bar */
+  document.body.classList.remove('bar-hidden');
+  barToggleLbl.textContent = 'OCULTAR';
+  resetView();
+  loadConfig();
+});
 
 /* =====================================================================
    Resize + init
