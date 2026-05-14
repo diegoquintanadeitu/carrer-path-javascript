@@ -1,5 +1,21 @@
 {
-  "urlsInicial": ["https://diegoquintanadeitu.github.io/"],
-  "device": "mobile",
-  "menu": "oculto"
+  "menu": "oculto",
+  "framesInicial": [
+    {
+      "url": "https://diegoquintanadeitu.github.io/",
+      "device": "mobile",
+      "x": -195,
+      "y": -428
+    }
+  ],
+  "textosInicial": [
+    {
+      "text": "PORFOLIO",
+      "x": -500.39892825427944,
+      "y": -239.2869823410212,
+      "w": 417,
+      "fontSize": 86,
+      "rotation": 270.0239161960268
+    }
+  ]
 }
