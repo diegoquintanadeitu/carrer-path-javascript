@@ -294,6 +294,16 @@
       animation: pop-in 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
     }
 
+    .fw-shell {
+      outline: 2.5px solid transparent;
+      outline-offset: 3px;
+      transition: outline-color 0.15s, filter 0.15s;
+    }
+    .fw.focused .fw-shell {
+      outline-color: rgba(99, 132, 255, 0.7);
+      filter: drop-shadow(0 0 14px rgba(99, 132, 255, 0.28));
+    }
+
     @keyframes pop-in {
       from { opacity: 0; transform: scale(0.85); }
       to   { opacity: 1; transform: scale(1); }
@@ -1100,8 +1110,15 @@ function buildFrame(data) {
     shell = phone;
   }
 
+  shell.classList.add('fw-shell');
   fw.append(label, shell);
   world.appendChild(fw);
+
+  /* focus frame on bezel click */
+  shell.addEventListener('mousedown', () => {
+    document.querySelectorAll('.fw.focused').forEach(el => el.classList.remove('focused'));
+    fw.classList.add('focused');
+  });
 
   /* double-click label → zoom-to-fit toggle */
   label.addEventListener('dblclick', e => {
@@ -1184,6 +1201,10 @@ window.addEventListener('keydown', e => {
 vp.addEventListener('mousedown', e => {
   /* ignore clicks on interactive children */
   if (e.target.closest('.fw-label, .fw-close, .fw-open, .fw-devs, #url-input, #add-btn, .z-btn, .blocked-link')) return;
+  /* defocus all frames when clicking on canvas background */
+  if (!e.target.closest('.fw')) {
+    document.querySelectorAll('.fw.focused').forEach(el => el.classList.remove('focused'));
+  }
   if (e.button === 1 || (e.button === 0 && spaceDown)) {
     e.preventDefault();
     panning = true;
