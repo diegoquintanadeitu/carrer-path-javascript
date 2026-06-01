@@ -1,21 +1,37 @@
-{
+  {
   "menu": "oculto",
+  "zoom": 0.5,
   "framesInicial": [
     {
-      "url": "https://diegoquintanadeitu.github.io/",
-      "device": "mobile",
-      "x": -195,
-      "y": -428
-    }
+            "url": "https://diegoquintanadeitu.github.io/",
+            "device": "mobile",
+            "x": -195,
+            "y": -428
+        },
+        {
+            "url": "https://app.diegoquintana.ar",
+            "device": "mobile",
+            "x": 399.8722909621359,
+            "y": -265.59809050125597
+        }
   ],
   "textosInicial": [
     {
-      "text": "PORFOLIO",
-      "x": -500.39892825427944,
-      "y": -239.2869823410212,
-      "w": 417,
-      "fontSize": 86,
-      "rotation": 270.0239161960268
-    }
+            "text": "PORFOLIO",
+            "x": -500.39892825427944,
+            "y": -239.2869823410212,
+            "w": 417,
+            "fontSize": 86,
+            "rotation": 270.0239161960268
+        },
+        {
+            "text": "Labs 🧪",
+            "x": 203.47941523863045,
+            "y": -462.2152492327928,
+            "w": 366,
+            "fontSize": 93,
+            "rotation": 321.3254056604026
+        }
   ]
 }
+  

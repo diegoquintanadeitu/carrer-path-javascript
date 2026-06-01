@@ -2051,6 +2051,12 @@ async function loadConfig() {
       localStorage.setItem('bar_hidden', '1');
     }
 
+    /* zoom inicial */
+    if (typeof cfg.zoom === 'number' && cfg.zoom > 0) {
+      T.s = cfg.zoom;
+      applyT();
+    }
+
     /* ── framesInicial: frames con posicion y dispositivo completos ── */
     if (Array.isArray(cfg.framesInicial) && cfg.framesInicial.length) {
       cfg.framesInicial.forEach(f => {
