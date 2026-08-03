@@ -486,6 +486,18 @@
     }
     .fw-open:hover { background: rgba(255,255,255,0.14); color: #fff; }
 
+    .fw-cast {
+      flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 7px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fw-cast:hover { background: rgba(99,200,255,0.18); color: #7fd4ff; }
+    .fw-cast.casting { background: rgba(99,200,255,0.25); color: #7fd4ff; }
+
     /* per-frame device picker */
     .fw-devs { display: flex; gap: 2px; flex-shrink: 0; }
     .fw-devs button {
@@ -932,7 +944,7 @@
       gap: 7px;
       flex-wrap: wrap;
       justify-content: center;
-      z-index: 200;
+      z-index: 1;
       pointer-events: none;
     }
 
@@ -1498,12 +1510,36 @@ function buildFrame(data) {
   } catch { openBtn.href = url; }
   openBtn.addEventListener('click', e => e.stopPropagation());
 
+  /* cast button – only shown in Chrome with Presentation API support */
+  let castBtn = null;
+  if ('PresentationRequest' in window) {
+    let castUrl = url;
+    try {
+      const ytId3 = new URL(url).pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
+      if (ytId3) castUrl = `https://www.youtube.com/watch?v=${ytId3[1]}`;
+    } catch {}
+    castBtn = document.createElement('button');
+    castBtn.className = 'fw-cast';
+    castBtn.title = 'Castear a Chromecast';
+    castBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`;
+    let conn = null;
+    castBtn.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (conn) { conn.terminate(); conn = null; castBtn.classList.remove('casting'); return; }
+      try {
+        const req = new PresentationRequest([castUrl]);
+        conn = await req.start();
+        castBtn.classList.add('casting');
+        conn.addEventListener('terminate', () => { conn = null; castBtn.classList.remove('casting'); });
+      } catch {}
+    });
+  }
   const closeBtn = document.createElement('button');
   closeBtn.className = 'fw-close';
   closeBtn.innerHTML = '✕';
   closeBtn.title = 'Cerrar';
   closeBtn.addEventListener('click', e => { e.stopPropagation(); removeFrame(id); });
-  label.append(title, openBtn, devStrip, closeBtn);
+  label.append(title, openBtn, ...(castBtn ? [castBtn] : []), devStrip, closeBtn);
 
   /* iframe */
   const iframe = document.createElement('iframe');
