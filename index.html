@@ -210,6 +210,7 @@
 
     /* Zoom strip */
     .zoom-strip {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 2px;
@@ -270,6 +271,44 @@
       letter-spacing: 0.02em;
     }
 
+    /* Sensitivity popover */
+    #sens-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 22, 22, 0.97);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 14px 12px;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      z-index: 300;
+      width: 190px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    }
+    #sens-popover.visible { display: flex; }
+    #sens-popover label {
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.45);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #sens-val {
+      font-size: 11px;
+      color: rgba(255,255,255,0.75);
+      font-variant-numeric: tabular-nums;
+    }
+    #sens-range {
+      width: 100%;
+      accent-color: #7fa3ff;
+      cursor: pointer;
+      margin: 0;
+    }
+
     /* ── Canvas ───────────────────────────────────────────────── */
     #bg-canvas {
       position: fixed;
@@ -301,6 +340,74 @@
     .fw.entering {
       animation: pop-in 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
     }
+
+    .full-screen {
+      position: relative;
+      overflow: hidden;
+      background: #050505;
+      border-radius: 6px;
+    }
+    .full-screen iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* fullscreen mode – fw moved to body, fixed over everything */
+    .fw.fw-fullscreen {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 191;
+      background: #050505;
+    }
+    .fw.fw-fullscreen .fw-label { display: none !important; }
+    .fw.fw-fullscreen .fw-shell {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .fw.fw-fullscreen .phone, .fw.fw-fullscreen .phone-screen,
+    .fw.fw-fullscreen .tablet-outer, .fw.fw-fullscreen .tablet-screen,
+    .fw.fw-fullscreen .desktop-wrap, .fw.fw-fullscreen .desktop-outer, .fw.fw-fullscreen .desktop-screen,
+    .fw.fw-fullscreen .monitor-outer, .fw.fw-fullscreen .monitor-screen-wrap, .fw.fw-fullscreen .monitor-screen,
+    .fw.fw-fullscreen .full-screen, .fw.fw-fullscreen iframe {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      border-radius: 0 !important;
+      transform: none !important;
+    }
+    .fw.fw-fullscreen .phone-island, .fw.fw-fullscreen .phone-home,
+    .fw.fw-fullscreen .tablet-camera, .fw.fw-fullscreen .desktop-chrome,
+    .fw.fw-fullscreen .desktop-base, .fw.fw-fullscreen .monitor-neck,
+    .fw.fw-fullscreen .monitor-foot { display: none !important; }
+
+    #fs-exit {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 210;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(20,20,20,0.85);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.9);
+      font-size: 17px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    body.has-fullscreen #fs-exit { display: flex; }
 
     .fw-shell {
       outline: 2.5px solid transparent;
@@ -1065,6 +1172,12 @@
     <button class="z-btn" id="z-in"  title="Acercar (Ctrl +)">+</button>
     <button class="z-btn" id="z-fit" title="Restablecer vista (Ctrl 0)"
             style="font-size:10px;width:auto;padding:0 7px">1:1</button>
+    <button class="z-btn" id="z-sens" title="Sensibilidad del zoom"
+            style="font-size:13px;width:auto;padding:0 7px">⚙</button>
+    <div id="sens-popover">
+      <label>Sensibilidad zoom<span id="sens-val">44%</span></label>
+      <input type="range" id="sens-range" min="3" max="30" step="1" value="15">
+    </div>
   </div>
   <button id="text-btn" title="Agregar texto (T)">T</button>
   <button id="save-default-btn" title="Guardar estado actual como inicio" style="display:none">★</button>
@@ -1073,6 +1186,7 @@
 <div id="viewport">
   <div id="world"></div>
 </div>
+<button id="fs-exit" title="Salir de pantalla completa (Esc)">✕</button>
 
 <!-- Empty state -->
 <div id="empty">
@@ -1110,12 +1224,17 @@ let panStart = { x: 0, y: 0 };
 let spaceDown = false;
 let dragging = null;  // { data, el, ox, oy }
 let zSeq = 100;       // stacking order counter
+let zoomSensitivity = 1 + (parseInt(localStorage.getItem('zoom_sens') || '15') / 100);
 
 const DEVICES = {
   mobile:  { outerW: 390,  outerH: 856  },
   tablet:  { outerW: 600,  outerH: 840  },
   desktop: { outerW: 1100, outerH: 736  },
   monitor: { outerW: 1400, outerH: 866  },
+  get full() {
+    const barH = document.body.classList.contains('bar-hidden') ? 0 : 58;
+    return { outerW: innerWidth, outerH: innerHeight - barH };
+  }
 };
 let selectedDevice = 'mobile';
 
@@ -1266,6 +1385,23 @@ function normalizeUrl(raw) {
 /* =====================================================================
    Add / remove frames
 ===================================================================== */
+/* Centre viewport and animate to a newly added world-space element */
+function zoomToNewElement(wx, wy, ww, wh, maxS) {
+  const barH   = document.body.classList.contains('bar-hidden') ? 0 : 58;
+  const pad    = 64;
+  const availW = innerWidth  - pad * 2;
+  const availH = innerHeight - barH - pad * 2;
+  const newS   = Math.min(availW / ww, availH / wh, maxS);
+
+  T.s = newS;
+  T.x = innerWidth  / 2 - (wx + ww / 2) * newS;
+  T.y = (innerHeight + barH) / 2 - (wy + wh / 2) * newS;
+
+  world.style.transition = 'transform 0.42s cubic-bezier(0.4,0,0.2,1)';
+  applyT();
+  world.addEventListener('transitionend', () => { world.style.transition = ''; }, { once: true });
+}
+
 function addFrame(raw) {
   const url = normalizeUrl(raw);
   if (!url) {
@@ -1291,9 +1427,11 @@ function addFrame(raw) {
 
   urlInp.value = '';
   emptyEl.classList.add('hidden');
+  return data;
 }
 
 function removeFrame(id) {
+  if (_fullFw?.id === 'fw-' + id) { _fullAnchor?.remove(); _fullFw = _fullAnchor = null; }
   frames = frames.filter(f => f.id !== id);
   document.getElementById('fw-' + id)?.remove();
   if (!frames.length && !texts.length) emptyEl.classList.remove('hidden');
@@ -1333,13 +1471,17 @@ function buildFrame(data) {
   /* per-frame device switcher */
   const devStrip = document.createElement('div');
   devStrip.className = 'fw-devs';
-  const DEV_ICONS = { mobile: '📱', tablet: '⬜', desktop: '💻', monitor: '🖥' };
+  const DEV_ICONS = { mobile: '📱', tablet: '⬜', desktop: '💻', monitor: '🖥', full: '⛶' };
   Object.keys(DEV_ICONS).forEach(dev => {
     const b = document.createElement('button');
     b.textContent = DEV_ICONS[dev];
     b.title = dev.charAt(0).toUpperCase() + dev.slice(1);
     if (dev === device) b.classList.add('active');
-    b.addEventListener('click', e => { e.stopPropagation(); rebuildFrame(data, dev); });
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      if (dev === 'full') { _fullFw === fw ? exitFullFw() : enterFullFw(fw); }
+      else { if (_fullFw === fw) exitFullFw(); rebuildFrame(data, dev); }
+    });
     devStrip.appendChild(b);
   });
 
@@ -1482,6 +1624,15 @@ function buildFrame(data) {
     outer.append(wrap, neck, foot);
     shell = outer;
 
+  } else if (device === 'full') {
+    const { outerW, outerH } = DEVICES.full;
+    const div = document.createElement('div');
+    div.className = 'full-screen';
+    div.style.width  = outerW + 'px';
+    div.style.height = outerH + 'px';
+    div.append(iframe, blocked);
+    shell = div;
+
   } else {
     /* mobile (default) */
     const phone = document.createElement('div');
@@ -1520,9 +1671,9 @@ function buildFrame(data) {
     }
   });
 
-  /* drag label → move frame */
+  /* drag label → move frame (disabled in fullscreen) */
   label.addEventListener('mousedown', e => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || _fullFw === fw) return;
     fw.style.zIndex = ++zSeq;
     e.stopPropagation();
     e.preventDefault();
@@ -1547,6 +1698,7 @@ function addTextNode() {
   el.querySelector('.tw-body').focus();
   emptyEl.classList.add('hidden');
   saveState();
+  zoomToNewElement(data.x, data.y, data.w, data.fontSize * 2, 1.5);
 }
 
 function buildTextNode(data) {
@@ -1733,7 +1885,29 @@ function buildTextNode(data) {
    Zoom-to-fit ("fullscreen") helpers
 ===================================================================== */
 let _fsFrame = null;
-let _fsPrevT  = null;   // saved transform to restore
+let _fsPrevT  = null;
+
+let _fullFw = null, _fullAnchor = null;
+const _fsExitBtn = document.getElementById('fs-exit');
+_fsExitBtn.addEventListener('click', exitFullFw);
+function enterFullFw(fw) {
+  if (_fullFw === fw) return;
+  if (_fullFw) exitFullFw();
+  _fullAnchor = document.createComment('fw-full');
+  fw.parentNode.insertBefore(_fullAnchor, fw);
+  document.body.appendChild(fw);
+  fw.classList.add('fw-fullscreen');
+  document.body.classList.add('has-fullscreen');
+  _fullFw = fw;
+}
+function exitFullFw() {
+  if (!_fullFw) return;
+  _fullFw.classList.remove('fw-fullscreen');
+  _fullAnchor?.parentNode?.insertBefore(_fullFw, _fullAnchor);
+  _fullAnchor?.remove();
+  document.body.classList.remove('has-fullscreen');
+  _fullFw = _fullAnchor = null;
+}   // saved transform to restore
 
 function enterFs(fw, data) {
   if (_fsFrame) exitFs();
@@ -1778,6 +1952,7 @@ function exitFs() {
 
 /* Escape exits zoom-to-fit */
 window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _fullFw) { exitFullFw(); return; }
   if (e.key === 'Escape' && _fsFrame) exitFs();
 });
 
@@ -1842,7 +2017,7 @@ vp.addEventListener('wheel', e => {
   e.preventDefault();
   if (e.ctrlKey || e.metaKey) {
     /* pinch-to-zoom or Ctrl+scroll */
-    const factor = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+    const factor = e.deltaY < 0 ? zoomSensitivity : 1 / zoomSensitivity;
     zoomTo(T.s * factor, e.clientX, e.clientY);
   } else {
     /* two-finger scroll → pan */
@@ -1882,8 +2057,16 @@ window.addEventListener('keyup', e => {
 /* =====================================================================
    Buttons
 ===================================================================== */
-addBtn.addEventListener('click',  () => { addFrame(urlInp.value); urlInp.focus(); });
-urlInp.addEventListener('keydown', e => { if (e.key === 'Enter') addFrame(urlInp.value); });
+addBtn.addEventListener('click', () => {
+  const data = addFrame(urlInp.value);
+  if (data) { const dev = DEVICES[data.device] || DEVICES.mobile; zoomToNewElement(data.x, data.y, dev.outerW, dev.outerH + 44, 1); }
+  urlInp.focus();
+});
+urlInp.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const data = addFrame(urlInp.value);
+  if (data) { const dev = DEVICES[data.device] || DEVICES.mobile; zoomToNewElement(data.x, data.y, dev.outerW, dev.outerH + 44, 1); }
+});
 
 /* bar toggle */
 const barToggleBtn = document.getElementById('bar-toggle');
@@ -1914,6 +2097,37 @@ document.querySelectorAll('.dev-btn').forEach(btn => {
 document.getElementById('z-in'   ).addEventListener('click', () => { zoomTo(T.s * 1.2); saveState(); });
 document.getElementById('z-out'  ).addEventListener('click', () => { zoomTo(T.s / 1.2); saveState(); });
 document.getElementById('z-fit'  ).addEventListener('click', () => { resetView();        saveState(); });
+
+/* Zoom sensitivity popover */
+(function () {
+  const btn      = document.getElementById('z-sens');
+  const popover  = document.getElementById('sens-popover');
+  const range    = document.getElementById('sens-range');
+  const valLabel = document.getElementById('sens-val');
+
+  /* maps internal range 3–30 to display 1–100% */
+  function toDisplay(v) { return Math.round((v - 3) / 27 * 99) + 1; }
+
+  const saved = parseInt(localStorage.getItem('zoom_sens') || '15');
+  range.value = saved;
+  valLabel.textContent = toDisplay(saved) + '%';
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    popover.classList.toggle('visible');
+  });
+
+  range.addEventListener('input', () => {
+    const v = parseInt(range.value);
+    valLabel.textContent = toDisplay(v) + '%';
+    zoomSensitivity = 1 + v / 100;
+    localStorage.setItem('zoom_sens', String(v));
+  });
+
+  document.addEventListener('click', () => popover.classList.remove('visible'));
+  popover.addEventListener('click', e => e.stopPropagation());
+})();
+
 document.getElementById('text-btn').addEventListener('click', () => addTextNode());
 
 /* =====================================================================
@@ -2157,7 +2371,7 @@ function reorderByLayers(orderedItems) {
 
 function renderLayers() {
   if (!layersListEl) return;
-  const DEV_ICONS = { mobile: '📱', tablet: '⬜', desktop: '💻', monitor: '🖥' };
+  const DEV_ICONS = { mobile: '📱', tablet: '⬜', desktop: '💻', monitor: '🖥', full: '⛶' };
   const getZ = item => {
     const el = document.getElementById((item._kind === 'frame' ? 'fw-' : 'tw-') + item.id);
     return el ? (parseInt(el.style.zIndex) || 0) : 0;

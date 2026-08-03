@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate (syntax, server smoke)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check server syntax
+        run: node --check server.js
+
+      - name: Check required files
+        run: |
+          test -f index.html
+          test -f config.json
+          test -f server.js
+
+      - name: Start server and smoke test
+        run: |
+          node server.js &
+          SERVER_PID=$!
+          sleep 2
+          curl -fsS http://localhost:3000/ > /dev/null
+          kill $SERVER_PID
