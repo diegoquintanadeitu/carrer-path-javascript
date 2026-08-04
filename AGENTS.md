@@ -32,3 +32,10 @@ Definition of done
 Known risks
 - No package.json toolchain by default.
 - Browser-facing behavior mostly embedded in one HTML file, so regressions can be broad.
+- YouTube autoplay can race on video end: next playback may start one candidate first and then get overwritten by another candidate a moment later.
+
+Autoplay note for future agents
+- Observed symptom: when a video ends, the app can trigger more than one "next" transition and the first loaded next video gets replaced by a second one.
+- Likely cause: duplicated/late YouTube postMessage events (infoDelivery + onStateChange and/or fallback paths) advancing queue more than once.
+- Priority in this project: prefer continuity (always move to another video) over strict dedupe complexity.
+- Minimal mitigation strategy: keep a single next-transition path per ended event, and avoid re-introducing multiple overlapping fallback branches unless absolutely necessary.
