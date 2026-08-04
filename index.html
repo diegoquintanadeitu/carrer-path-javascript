@@ -755,22 +755,31 @@
     }
 
     .tw-handle {
-      height: 22px;
-      display: flex;
+      height: 28px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 28px 1fr 28px;
       align-items: center;
-      justify-content: flex-end;
-      padding: 0 2px;
-      cursor: grab;
       opacity: 0;
       transition: opacity 0.15s;
+      border-radius: 5px 5px 0 0;
+      overflow: hidden;
     }
     .tw:hover .tw-handle { opacity: 1; }
-    .tw-handle:active { cursor: grabbing; }
+    .tw-drag-center {
+      margin: 10px;
+      height: 100%;
+      cursor: grab;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px);
+      background-size: 6px 6px;
+      background-position: center;
+    }
+    .tw-drag-center:active { cursor: grabbing; }
 
     .tw-close {
       flex-shrink: 0;
-      width: 18px;
-      height: 18px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: rgba(255, 75, 75, 0.12);
       border: 1px solid rgba(255, 75, 75, 0.28);
@@ -858,26 +867,18 @@
 
     /* ── Rotation handle ──────────────────────────────────── */
     .tw-rotate {
-      position: absolute;
-      left: -9px;
-      top: -9px;
-      width: 20px;
-      height: 20px;
+      width: 28px;
+      height: 28px;
       cursor: grab;
-      z-index: 4;
-      opacity: 0;
-      transition: opacity 0.15s;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      color: rgba(99, 132, 255, 0.85);
+      font-size: 13px;
+      color: rgba(99, 132, 255, 0.7);
       user-select: none;
-      border-radius: 50%;
-      background: rgba(18, 18, 18, 0.85);
-      border: 1px solid rgba(99, 132, 255, 0.35);
+      transition: background 0.12s, color 0.12s;
     }
-    .tw:hover .tw-rotate { opacity: 1; }
+    .tw-rotate:hover { background: rgba(99, 132, 255, 0.12); color: rgba(99, 132, 255, 1); }
     .tw-rotate:active { cursor: grabbing; }
 
     .tw-rot-badge {
@@ -1189,6 +1190,9 @@
     <div id="sens-popover">
       <label>Sensibilidad zoom<span id="sens-val">44%</span></label>
       <input type="range" id="sens-range" min="3" max="30" step="1" value="15">
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:4px 0">
+      <label>Sensibilidad scroll<span id="scroll-sens-val">50%</span></label>
+      <input type="range" id="scroll-sens-range" min="1" max="100" step="1" value="50">
     </div>
   </div>
   <button id="text-btn" title="Agregar texto (T)">T</button>
@@ -1236,7 +1240,8 @@ let panStart = { x: 0, y: 0 };
 let spaceDown = false;
 let dragging = null;  // { data, el, ox, oy }
 let zSeq = 100;       // stacking order counter
-let zoomSensitivity = 1 + (parseInt(localStorage.getItem('zoom_sens') || '15') / 100);
+let zoomSensitivity  = 1 + (parseInt(localStorage.getItem('zoom_sens')    || '15') / 100);
+let scrollSensitivity = parseInt(localStorage.getItem('scroll_sens') || '50') / 100;
 
 const DEVICES = {
   mobile:  { outerW: 390,  outerH: 856  },
@@ -1752,9 +1757,63 @@ function buildTextNode(data) {
     tw.style.transform = 'rotate(' + data.rotation + 'deg)';
   }, { once: true });
 
-  /* handle: drag zone + close button */
+  /* top navbar: [rotate | drag-texture | close] */
   const handle = document.createElement('div');
   handle.className = 'tw-handle';
+
+  const rotHandle = document.createElement('div');
+  rotHandle.className = 'tw-rotate';
+  rotHandle.title = 'Rotar  /  doble clic →0°';
+  rotHandle.textContent = '↺';
+
+  const rotBadge = document.createElement('div');
+  rotBadge.className = 'tw-rot-badge';
+
+  rotHandle.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    e.preventDefault();
+    tw.style.zIndex = ++zSeq;
+    const cx_w     = data.x + tw.offsetWidth  / 2;
+    const cy_w     = data.y + tw.offsetHeight / 2;
+    const startMx  = (e.clientX - T.x) / T.s;
+    const startMy  = (e.clientY - T.y) / T.s;
+    const startAng = Math.atan2(startMy - cy_w, startMx - cx_w) * 180 / Math.PI;
+    const startRot = data.rotation || 0;
+    rotBadge.style.display = 'block';
+    rotBadge.textContent   = Math.round(startRot) + '°';
+    function onRotMove(ev) {
+      const mx  = (ev.clientX - T.x) / T.s;
+      const my  = (ev.clientY - T.y) / T.s;
+      const ang = Math.atan2(my - cy_w, mx - cx_w) * 180 / Math.PI;
+      data.rotation = startRot + (ang - startAng);
+      tw.style.transform     = 'rotate(' + data.rotation + 'deg)';
+      rotBadge.textContent   = Math.round(data.rotation) + '°';
+    }
+    function onRotUp() {
+      window.removeEventListener('mousemove', onRotMove);
+      window.removeEventListener('mouseup',   onRotUp);
+      rotBadge.style.display = 'none';
+      world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
+      document.body.style.userSelect = '';
+      saveState();
+    }
+    window.addEventListener('mousemove', onRotMove);
+    window.addEventListener('mouseup',   onRotUp);
+    world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = 'none');
+    document.body.style.userSelect = 'none';
+  });
+
+  rotHandle.addEventListener('dblclick', e => {
+    e.stopPropagation();
+    data.rotation = 0;
+    tw.style.transform = 'rotate(0deg)';
+    tw.style.setProperty('--rot', '0deg');
+    saveState();
+  });
+
+  const dragCenter = document.createElement('div');
+  dragCenter.className = 'tw-drag-center';
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'tw-close';
@@ -1768,7 +1827,7 @@ function buildTextNode(data) {
     if (!frames.length && !texts.length) emptyEl.classList.remove('hidden');
     saveState();
   });
-  handle.appendChild(closeBtn);
+  handle.append(rotHandle, dragCenter, closeBtn);
 
   /* editable body */
   const body = document.createElement('div');
@@ -1790,8 +1849,8 @@ function buildTextNode(data) {
     e.stopPropagation();
   });
 
-  /* drag via handle */
-  handle.addEventListener('mousedown', e => {
+  /* drag via center texture area */
+  dragCenter.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
     tw.style.zIndex = ++zSeq;
     e.stopPropagation();
@@ -1858,61 +1917,7 @@ function buildTextNode(data) {
     window.addEventListener('mouseup', onUp);
   });
 
-  tw.append(handle, body, resizeR, resizeBr);
-
-  /* rotation handle (top-left corner) */
-  const rotHandle = document.createElement('div');
-  rotHandle.className = 'tw-rotate';
-  rotHandle.title = 'Rotar  /  doble clic →0°';
-  rotHandle.textContent = '↺';
-
-  const rotBadge = document.createElement('div');
-  rotBadge.className = 'tw-rot-badge';
-
-  rotHandle.addEventListener('mousedown', e => {
-    if (e.button !== 0) return;
-    e.stopPropagation();
-    e.preventDefault();
-    tw.style.zIndex = ++zSeq;
-    const cx_w     = data.x + tw.offsetWidth  / 2;
-    const cy_w     = data.y + tw.offsetHeight / 2;
-    const startMx  = (e.clientX - T.x) / T.s;
-    const startMy  = (e.clientY - T.y) / T.s;
-    const startAng = Math.atan2(startMy - cy_w, startMx - cx_w) * 180 / Math.PI;
-    const startRot = data.rotation || 0;
-    rotBadge.style.display = 'block';
-    rotBadge.textContent   = Math.round(startRot) + '°';
-    function onRotMove(ev) {
-      const mx  = (ev.clientX - T.x) / T.s;
-      const my  = (ev.clientY - T.y) / T.s;
-      const ang = Math.atan2(my - cy_w, mx - cx_w) * 180 / Math.PI;
-      data.rotation = startRot + (ang - startAng);
-      tw.style.transform     = 'rotate(' + data.rotation + 'deg)';
-      rotBadge.textContent   = Math.round(data.rotation) + '°';
-    }
-    function onRotUp() {
-      window.removeEventListener('mousemove', onRotMove);
-      window.removeEventListener('mouseup',   onRotUp);
-      rotBadge.style.display = 'none';
-      world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
-      document.body.style.userSelect = '';
-      saveState();
-    }
-    window.addEventListener('mousemove', onRotMove);
-    window.addEventListener('mouseup',   onRotUp);
-    world.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = 'none');
-    document.body.style.userSelect = 'none';
-  });
-
-  rotHandle.addEventListener('dblclick', e => {
-    e.stopPropagation();
-    data.rotation = 0;
-    tw.style.transform = 'rotate(0deg)';
-    tw.style.setProperty('--rot', '0deg');
-    saveState();
-  });
-
-  tw.append(rotHandle, rotBadge, handle, body, resizeR, resizeBr);
+  tw.append(rotBadge, handle, body, resizeR, resizeBr);
   world.appendChild(tw);
   return tw;
 }
@@ -2057,8 +2062,8 @@ vp.addEventListener('wheel', e => {
     zoomTo(T.s * factor, e.clientX, e.clientY);
   } else {
     /* two-finger scroll → pan */
-    T.x -= e.deltaX;
-    T.y -= e.deltaY;
+    T.x -= e.deltaX * scrollSensitivity;
+    T.y -= e.deltaY * scrollSensitivity;
     applyT();
   }
   saveStateDeferred();
@@ -2158,6 +2163,19 @@ document.getElementById('z-fit'  ).addEventListener('click', () => { resetView()
     valLabel.textContent = toDisplay(v) + '%';
     zoomSensitivity = 1 + v / 100;
     localStorage.setItem('zoom_sens', String(v));
+  });
+
+  /* scroll sensitivity */
+  const scrollRange    = document.getElementById('scroll-sens-range');
+  const scrollValLabel = document.getElementById('scroll-sens-val');
+  const savedScroll    = parseInt(localStorage.getItem('scroll_sens') || '50');
+  scrollRange.value            = savedScroll;
+  scrollValLabel.textContent   = savedScroll + '%';
+  scrollRange.addEventListener('input', () => {
+    const v = parseInt(scrollRange.value);
+    scrollValLabel.textContent = v + '%';
+    scrollSensitivity = v / 100;
+    localStorage.setItem('scroll_sens', String(v));
   });
 
   document.addEventListener('click', () => popover.classList.remove('visible'));
