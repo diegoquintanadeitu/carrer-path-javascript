@@ -189,24 +189,125 @@
     #add-btn:hover  { background: #7592ff; }
     #add-btn:active { transform: scale(0.9); }
 
-    #reset-btn {
-      flex-shrink: 0;
+    #tools-wrap { position: relative; flex-shrink: 0; }
+    #tools-btn {
       width: 34px;
       height: 38px;
       border-radius: 7px;
-      background: #5c7dff;
-      border: none;
-      color: #fff;
-      font-size: 20px;
-      line-height: 1;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.65);
+      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
     }
-    #reset-btn:hover  { background: #7592ff; }
-    #reset-btn:active { transform: scale(0.9); }
+    #tools-btn:hover  { background: rgba(255,255,255,0.13); color: #fff; }
+    #tools-btn:active { transform: scale(0.9); }
+    #tools-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: rgba(18, 18, 18, 0.97);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 11px;
+      padding: 5px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 300;
+      min-width: 210px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.55);
+      backdrop-filter: blur(16px);
+    }
+    #tools-menu.visible { display: flex; }
+    .tool-item {
+      width: 100%;
+      height: 36px;
+      border-radius: 7px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.78);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      text-align: left;
+      transition: background 0.12s, color 0.12s;
+    }
+    .tool-item:hover  { background: rgba(255,255,255,0.08); color: #fff; }
+    .tool-item:active { background: rgba(255,255,255,0.14); }
+    .tool-icon { width: 20px; text-align: center; font-size: 14px; flex-shrink: 0; color: rgba(255,255,255,0.4); }
+    .tool-label { flex: 1; }
+    .tool-kbd {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+    }
+    .tool-sep { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 3px 0; }
+    .tool-item.tool-danger { color: rgba(255,90,90,0.85); }
+    .tool-item.tool-danger .tool-icon { color: rgba(255,90,90,0.5); }
+    .tool-item.tool-danger:hover { background: rgba(255,50,50,0.12); color: #ff7070; }
+    .tool-search-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      height: 36px;
+    }
+    .tool-search-input {
+      flex: 1;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: #f0f0f0;
+      font-size: 12px;
+      font-family: inherit;
+      padding: 0 8px;
+      height: 26px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .tool-search-input:focus { border-color: rgba(255,80,80,0.5); background: rgba(255,255,255,0.1); }
+    .tool-search-input::placeholder { color: rgba(255,255,255,0.22); }
+    .yt-results {
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 0 5px 4px;
+    }
+    .yt-results.visible { display: flex; }
+    .yt-result {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.76);
+      border-radius: 7px;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 7px 10px;
+      line-height: 1.35;
+      transition: background 0.12s, color 0.12s;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .yt-result:hover { background: rgba(255,255,255,0.09); color: #fff; }
 
     /* Zoom strip */
     .zoom-strip {
@@ -727,27 +828,6 @@
     }
 
     /* ── Text nodes ─────────────────────────────────────────────── */
-    #text-btn {
-      flex-shrink: 0;
-      width: 34px;
-      height: 38px;
-      border-radius: 7px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.65);
-      font-size: 14px;
-      font-weight: 700;
-      font-family: inherit;
-      letter-spacing: -0.03em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s, transform 0.1s;
-    }
-    #text-btn:hover  { background: rgba(255,255,255,0.13); color: #fff; }
-    #text-btn:active { transform: scale(0.9); }
-
     .tw { position: absolute; }
 
     .tw.entering {
@@ -1195,9 +1275,28 @@
       <input type="range" id="scroll-sens-range" min="1" max="100" step="1" value="50">
     </div>
   </div>
-  <button id="text-btn" title="Agregar texto (T)">T</button>
-  <button id="save-default-btn" title="Guardar estado actual como inicio" style="display:none">★</button>
-  <button id="reset-btn" title="Reiniciar dashboard">↺</button>
+  <div id="tools-wrap">
+    <button id="tools-btn" title="Herramientas">⊞</button>
+    <div id="tools-menu">
+      <button class="tool-item" id="text-btn">
+        <span class="tool-icon">T</span>
+        <span class="tool-label">Agregar texto</span>
+        <kbd class="tool-kbd">T</kbd>
+      </button>
+      <div class="tool-search-row">
+        <span class="tool-icon" style="color:rgba(255,80,80,0.8)">▶</span>
+        <input id="yt-search-input" class="tool-search-input"
+               type="text" placeholder="Buscar YouTube…"
+               autocomplete="off" spellcheck="false">
+      </div>
+      <div id="yt-search-results" class="yt-results"></div>
+      <hr class="tool-sep">
+      <button class="tool-item tool-danger" id="reset-btn">
+        <span class="tool-icon">↺</span>
+        <span class="tool-label">Reiniciar dashboard</span>
+      </button>
+    </div>
+  </div>
 </div>
 <div id="viewport">
   <div id="world"></div>
@@ -1449,6 +1548,15 @@ function addFrame(raw) {
 
 function removeFrame(id) {
   if (_fullFw?.id === 'fw-' + id) { _fullAnchor?.remove(); _fullFw = _fullAnchor = null; }
+  if (id === ytSearchFrameId) {
+    ytSearchFrameId = null;
+    ytAutoEnabled = false;
+    ytAutoTheme = '';
+    ytAutoQueue = [];
+    ytAutoSeen = new Set();
+    ytAutoCurrentId = null;
+    ytAutoPlayerWindow = null;
+  }
   frames = frames.filter(f => f.id !== id);
   document.getElementById('fw-' + id)?.remove();
   if (!frames.length && !texts.length) emptyEl.classList.remove('hidden');
@@ -1462,9 +1570,165 @@ function rebuildFrame(data, newDevice) {
   saveState();
 }
 
+function createDeviceShell(device) {
+  let shell;
+  if (device === 'tablet') {
+    const outer = document.createElement('div');
+    outer.className = 'tablet-outer';
+    const cam = document.createElement('div');
+    cam.className = 'tablet-camera';
+    const screen = document.createElement('div');
+    screen.className = 'tablet-screen';
+    outer.append(cam, screen);
+    shell = outer;
+
+  } else if (device === 'desktop') {
+    const wrap = document.createElement('div');
+    wrap.className = 'desktop-wrap';
+    const outer = document.createElement('div');
+    outer.className = 'desktop-outer';
+    const chrome = document.createElement('div');
+    chrome.className = 'desktop-chrome';
+    chrome.innerHTML = `
+      <div class="chrome-dot red"></div>
+      <div class="chrome-dot yellow"></div>
+      <div class="chrome-dot green"></div>
+      <div class="chrome-urlbar"></div>`;
+    const screen = document.createElement('div');
+    screen.className = 'desktop-screen';
+    outer.append(chrome, screen);
+    const base = document.createElement('div');
+    base.className = 'desktop-base';
+    wrap.append(outer, base);
+    shell = wrap;
+
+  } else if (device === 'monitor') {
+    const outer = document.createElement('div');
+    outer.className = 'monitor-outer';
+    const wrap = document.createElement('div');
+    wrap.className = 'monitor-screen-wrap';
+    const screen = document.createElement('div');
+    screen.className = 'monitor-screen';
+    wrap.append(screen);
+    const neck = document.createElement('div');
+    neck.className = 'monitor-neck';
+    const foot = document.createElement('div');
+    foot.className = 'monitor-foot';
+    outer.append(wrap, neck, foot);
+    shell = outer;
+
+  } else if (device === 'full') {
+    const { outerW, outerH } = DEVICES.full;
+    const div = document.createElement('div');
+    div.className = 'full-screen';
+    div.style.width  = outerW + 'px';
+    div.style.height = outerH + 'px';
+    shell = div;
+
+  } else {
+    const phone = document.createElement('div');
+    phone.className = 'phone';
+    const island = document.createElement('div');
+    island.className = 'phone-island';
+    const screen = document.createElement('div');
+    screen.className = 'phone-screen';
+    const homeBar = document.createElement('div');
+    homeBar.className = 'phone-home';
+    phone.append(island, screen, homeBar);
+    shell = phone;
+  }
+  shell.classList.add('fw-shell');
+  return shell;
+}
+
+function getShellScreenHost(shell) {
+  return shell.querySelector('.phone-screen, .tablet-screen, .desktop-screen, .monitor-screen, .full-screen');
+}
+
+function attachFrameContent(shell, iframe, blocked) {
+  const host = getShellScreenHost(shell);
+  if (host) host.append(iframe, blocked);
+}
+
+function restoreYouTubeAfterMorph(fw, frameId, snapshot) {
+  const saved = snapshot || ytPlayerRuntimeByFrame.get(frameId);
+  if (!saved) return;
+  const iframe = fw.querySelector('.fw-shell iframe');
+  if (!iframe) return;
+
+  const runRestore = (tries = 2) => {
+    if (!iframe.contentWindow) return;
+    const t = typeof saved.currentTime === 'number' ? Math.max(0, saved.currentTime - 0.25) : 0;
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func: 'seekTo', args: [t, true] }),
+      'https://www.youtube.com'
+    );
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
+      'https://www.youtube.com'
+    );
+    if (tries > 0) setTimeout(() => runRestore(tries - 1), 500);
+  };
+
+  iframe.addEventListener('load', () => setTimeout(runRestore, 650), { once: true });
+  setTimeout(runRestore, 700);
+}
+
+function pollYouTubeRuntime() {
+  document.querySelectorAll('.fw iframe').forEach(iframe => {
+    if (!/youtube\.com\/embed/.test(iframe.src || '')) return;
+    if (!iframe.contentWindow) return;
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func: 'getCurrentTime', args: '' }),
+      'https://www.youtube.com'
+    );
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func: 'getPlayerState', args: '' }),
+      'https://www.youtube.com'
+    );
+  });
+}
+
+setInterval(pollYouTubeRuntime, 900);
+
+function morphFrameDevice(fw, data, newDevice) {
+  const oldShell = fw.querySelector('.fw-shell');
+  if (!oldShell) return rebuildFrame(data, newDevice);
+
+  const iframe = oldShell.querySelector('iframe');
+  const blocked = oldShell.querySelector('.blocked') || document.createElement('div');
+  if (!iframe) return rebuildFrame(data, newDevice);
+  const isYT = /youtube\.com\/embed/.test(iframe.src || '');
+  const ytSnapshot = isYT ? ytPlayerRuntimeByFrame.get(data.id) : null;
+
+  const first = fw.getBoundingClientRect();
+
+  const newShell = createDeviceShell(newDevice);
+  oldShell.before(newShell);
+  attachFrameContent(newShell, iframe, blocked);
+  oldShell.remove();
+  data.device = newDevice;
+
+  const last = fw.getBoundingClientRect();
+  const dx = first.left - last.left;
+  const dy = first.top - last.top;
+  const sx = last.width  ? first.width / last.width   : 1;
+  const sy = last.height ? first.height / last.height : 1;
+
+  fw.animate(
+    [
+      { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+      { transform: 'translate(0, 0) scale(1, 1)' }
+    ],
+    { duration: 320, easing: 'cubic-bezier(0.2, 0.75, 0.2, 1)' }
+  );
+  if (isYT) restoreYouTubeAfterMorph(fw, data.id, ytSnapshot);
+  saveState();
+}
+
 function buildFrame(data) {
   const { id, url, device = 'mobile' } = data;
-  const isYT = /www\.youtube\.com\/embed\//.test(url);
+  const isYT = /youtube\.com\/embed/.test(url);
 
   /* wrapper */
   const fw = document.createElement('div');
@@ -1482,7 +1746,8 @@ function buildFrame(data) {
   try {
     const u = new URL(url);
     const ytId = u.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
-    title.textContent = ytId ? `▶ YouTube · ${ytId[1]}` : u.hostname;
+    const ytQ  = u.searchParams.get('list');
+    title.textContent = ytId ? `▶ YouTube · ${ytId[1]}` : ytQ ? `🔍 ${ytQ}` : u.hostname;
   } catch { title.textContent = url; }
 
   /* per-frame device switcher */
@@ -1497,7 +1762,12 @@ function buildFrame(data) {
     b.addEventListener('click', e => {
       e.stopPropagation();
       if (dev === 'full') { _fullFw === fw ? exitFullFw() : enterFullFw(fw); }
-      else { if (_fullFw === fw) exitFullFw(); rebuildFrame(data, dev); }
+      else {
+        if (_fullFw === fw) exitFullFw();
+        devStrip.querySelectorAll('button').forEach(el => el.classList.remove('active'));
+        b.classList.add('active');
+        morphFrameDevice(fw, data, dev);
+      }
     });
     devStrip.appendChild(b);
   });
@@ -1510,8 +1780,12 @@ function buildFrame(data) {
   openBtn.setAttribute('rel', 'noopener noreferrer');
   /* for YouTube show the watch URL, otherwise use the raw url */
   try {
-    const ytId2 = new URL(url).pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
-    openBtn.href = ytId2 ? `https://www.youtube.com/watch?v=${ytId2[1]}` : url;
+    const u2 = new URL(url);
+    const ytId2 = u2.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
+    const ytQ2  = u2.searchParams.get('list');
+    openBtn.href = ytId2 ? `https://www.youtube.com/watch?v=${ytId2[1]}` :
+                   ytQ2  ? `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ2)}` :
+                   url;
   } catch { openBtn.href = url; }
   openBtn.addEventListener('click', e => e.stopPropagation());
 
@@ -1554,6 +1828,12 @@ function buildFrame(data) {
     iframe.setAttribute('allow',
       'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
     iframe.allowFullscreen = true;
+    iframe.addEventListener('load', () => {
+      if (!iframe.contentWindow) return;
+      iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), 'https://www.youtube.com');
+      iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onError'] }), 'https://www.youtube.com');
+      pollYouTubeRuntime();
+    });
   } else {
     iframe.setAttribute('sandbox',
       'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock');
@@ -1616,80 +1896,8 @@ function buildFrame(data) {
   }
 
   /* device shell */
-  let shell;
-  if (device === 'tablet') {
-    const outer = document.createElement('div');
-    outer.className = 'tablet-outer';
-    const cam = document.createElement('div');
-    cam.className = 'tablet-camera';
-    const screen = document.createElement('div');
-    screen.className = 'tablet-screen';
-    screen.append(iframe, blocked);
-    outer.append(cam, screen);
-    shell = outer;
-
-  } else if (device === 'desktop') {
-    const wrap = document.createElement('div');
-    wrap.className = 'desktop-wrap';
-    const outer = document.createElement('div');
-    outer.className = 'desktop-outer';
-    const chrome = document.createElement('div');
-    chrome.className = 'desktop-chrome';
-    chrome.innerHTML = `
-      <div class="chrome-dot red"></div>
-      <div class="chrome-dot yellow"></div>
-      <div class="chrome-dot green"></div>
-      <div class="chrome-urlbar"></div>`;
-    const screen = document.createElement('div');
-    screen.className = 'desktop-screen';
-    screen.append(iframe, blocked);
-    outer.append(chrome, screen);
-    const base = document.createElement('div');
-    base.className = 'desktop-base';
-    wrap.append(outer, base);
-    shell = wrap;
-
-  } else if (device === 'monitor') {
-    const outer = document.createElement('div');
-    outer.className = 'monitor-outer';
-    const wrap = document.createElement('div');
-    wrap.className = 'monitor-screen-wrap';
-    const screen = document.createElement('div');
-    screen.className = 'monitor-screen';
-    screen.append(iframe, blocked);
-    wrap.append(screen);
-    const neck = document.createElement('div');
-    neck.className = 'monitor-neck';
-    const foot = document.createElement('div');
-    foot.className = 'monitor-foot';
-    outer.append(wrap, neck, foot);
-    shell = outer;
-
-  } else if (device === 'full') {
-    const { outerW, outerH } = DEVICES.full;
-    const div = document.createElement('div');
-    div.className = 'full-screen';
-    div.style.width  = outerW + 'px';
-    div.style.height = outerH + 'px';
-    div.append(iframe, blocked);
-    shell = div;
-
-  } else {
-    /* mobile (default) */
-    const phone = document.createElement('div');
-    phone.className = 'phone';
-    const island = document.createElement('div');
-    island.className = 'phone-island';
-    const screen = document.createElement('div');
-    screen.className = 'phone-screen';
-    screen.append(iframe, blocked);
-    const homeBar = document.createElement('div');
-    homeBar.className = 'phone-home';
-    phone.append(island, screen, homeBar);
-    shell = phone;
-  }
-
-  shell.classList.add('fw-shell');
+  const shell = createDeviceShell(device);
+  attachFrameContent(shell, iframe, blocked);
   fw.append(label, shell);
   world.appendChild(fw);
   { const _z = data.zOrder || ++zSeq; if (data.zOrder > zSeq) zSeq = data.zOrder; fw.style.zIndex = _z; }
@@ -2117,6 +2325,8 @@ function toggleBar() {
   barToggleLbl.textContent = hidden ? 'MOSTRAR' : 'OCULTAR';
   localStorage.setItem('bar_hidden', hidden ? '1' : '0');
 }
+function closeMenu() { document.getElementById('tools-menu').classList.remove('visible'); }
+
 barToggleBtn.addEventListener('click', toggleBar);
 window.addEventListener('keydown', e => {
   const inInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
@@ -2183,6 +2393,288 @@ document.getElementById('z-fit'  ).addEventListener('click', () => { resetView()
 })();
 
 document.getElementById('text-btn').addEventListener('click', () => addTextNode());
+
+/* YouTube search: crea o refresca un frame de búsqueda */
+let ytSearchFrameId = null;
+let ytSearchTimer = null;
+let ytSearchReqId = 0;
+let ytLastItems = [];
+const ytPlayerRuntimeByFrame = new Map();
+let ytAutoTheme = '';
+let ytAutoQueue = [];
+let ytAutoSeen = new Set();
+let ytAutoCurrentId = null;
+let ytAutoPlayerWindow = null;
+let ytAutoEnabled = false;
+let ytAutoFetching = false;
+let ytAutoAdvanceLock = false;
+let ytAutoLastEndedId = null;
+let ytLastInfoDeliveryAt = 0;
+const ytInput = document.getElementById('yt-search-input');
+const ytResults = document.getElementById('yt-search-results');
+
+function clearYtResults() {
+  ytLastItems = [];
+  ytResults.innerHTML = '';
+  ytResults.classList.remove('visible');
+}
+
+function mountYouTubeVideo(id, autoplay) {
+  const auto = autoplay ? '1' : '0';
+  const embedUrl = `https://www.youtube.com/embed/${id}?autoplay=${auto}&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+  const existing = ytSearchFrameId != null && frames.find(f => f.id === ytSearchFrameId);
+  if (existing) {
+    const ifrEl = document.querySelector('#fw-' + ytSearchFrameId + ' iframe');
+    if (ifrEl) {
+      ifrEl.src = embedUrl;
+      existing.url = embedUrl;
+      saveState();
+      closeMenu();
+      clearYtResults();
+      return ifrEl;
+    }
+  }
+  const prevDevice = selectedDevice;
+  selectedDevice = 'desktop';
+  const data = addFrame(embedUrl);
+  selectedDevice = prevDevice;
+  if (data) {
+    ytSearchFrameId = data.id;
+    const dev = DEVICES.desktop;
+    zoomToNewElement(data.x, data.y, dev.outerW, dev.outerH + 44, 1);
+    const ifrEl = document.querySelector('#fw-' + ytSearchFrameId + ' iframe');
+    closeMenu();
+    clearYtResults();
+    return ifrEl;
+  }
+  closeMenu();
+  clearYtResults();
+  return null;
+}
+
+function armYouTubeEvents(iframe) {
+  if (!iframe) return;
+  const bind = () => {
+    if (!iframe.contentWindow) return;
+    ytAutoPlayerWindow = iframe.contentWindow;
+    ytAutoPlayerWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), 'https://www.youtube.com');
+    ytAutoPlayerWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onError'] }), 'https://www.youtube.com');
+  };
+  iframe.addEventListener('load', () => setTimeout(bind, 800), { once: true });
+  setTimeout(bind, 950);
+}
+
+async function ensureYtAutoQueue(minCount = 4) {
+  if (!ytAutoEnabled || !ytAutoTheme || ytAutoFetching || ytAutoQueue.length >= minCount) return;
+  ytAutoFetching = true;
+  try {
+    const r = await fetch(`/yt-search?q=${encodeURIComponent(ytAutoTheme)}`);
+    const data = await r.json();
+    const list = Array.isArray(data.items) ? data.items : [];
+    let added = 0;
+    list.forEach(item => {
+      if (!item || !item.id) return;
+      if (item.id === ytAutoCurrentId) return;
+      if (ytAutoSeen.has(item.id)) return;
+      ytAutoSeen.add(item.id);
+      ytAutoQueue.push(item.id);
+      added++;
+    });
+    if (!added) {
+      list.forEach(item => {
+        if (!item || !item.id) return;
+        if (item.id === ytAutoCurrentId) return;
+        if (ytAutoQueue.includes(item.id)) return;
+        ytAutoQueue.push(item.id);
+      });
+    }
+  } catch {}
+  ytAutoFetching = false;
+}
+
+async function playNextYtAuto() {
+  await ensureYtAutoQueue(1);
+  const nextId = ytAutoQueue.shift();
+  if (!nextId) {
+    if (ytAutoCurrentId) {
+      ytAutoLastEndedId = null;
+      const ifr = mountYouTubeVideo(ytAutoCurrentId, true);
+      armYouTubeEvents(ifr);
+    }
+    return;
+  }
+  ytAutoCurrentId = nextId;
+  ytAutoLastEndedId = null;
+  const ifr = mountYouTubeVideo(nextId, true);
+  armYouTubeEvents(ifr);
+  ensureYtAutoQueue(4);
+}
+
+function scheduleNextYtAuto(endedId, observedVideoId) {
+  const id = endedId || ytAutoCurrentId;
+  if (!ytAutoEnabled || !id) return;
+  if (id !== ytAutoCurrentId) return;
+  if (observedVideoId && observedVideoId !== id) return;
+  if (ytAutoLastEndedId === id) return;
+  ytAutoLastEndedId = id;
+  if (ytAutoAdvanceLock) return;
+  ytAutoAdvanceLock = true;
+  Promise.resolve(playNextYtAuto()).finally(() => {
+    setTimeout(() => { ytAutoAdvanceLock = false; }, 900);
+  });
+}
+
+function getFrameBySource(sourceWin) {
+  const iframe = [...document.querySelectorAll('.fw iframe')].find(f => f.contentWindow === sourceWin);
+  if (!iframe) return { iframe: null, frameId: NaN };
+  const fw = iframe.closest('.fw');
+  const frameId = fw ? parseInt(fw.id.replace('fw-', ''), 10) : NaN;
+  return { iframe, frameId };
+}
+
+function getEmbedVideoId(iframe) {
+  if (!iframe || !iframe.src) return null;
+  try {
+    const u = new URL(iframe.src);
+    const m = u.pathname.match(/\/embed\/([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+function startYtThemePlayback(item, idx) {
+  ytAutoTheme = ytInput.value.trim();
+  ytAutoEnabled = true;
+  ytAutoCurrentId = item.id;
+  ytAutoLastEndedId = null;
+  ytAutoSeen = new Set([item.id]);
+  ytAutoQueue = [];
+
+  ytLastItems.forEach(candidate => {
+    if (!candidate || !candidate.id) return;
+    if (candidate.id === item.id) return;
+    if (ytAutoSeen.has(candidate.id)) return;
+    ytAutoSeen.add(candidate.id);
+    ytAutoQueue.push(candidate.id);
+  });
+
+  const ifr = mountYouTubeVideo(item.id, item.autoplay === true || idx === 0);
+  armYouTubeEvents(ifr);
+  ensureYtAutoQueue(6);
+}
+
+window.addEventListener('message', e => {
+  let d;
+  try {
+    d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+  } catch {
+    return;
+  }
+  if (!d || !d.event) return;
+
+  const src = getFrameBySource(e.source);
+  const isYtAutoFrame = ytSearchFrameId != null && src.frameId === ytSearchFrameId;
+
+  if (d.event === 'infoDelivery' && d.info) {
+    if (!Number.isNaN(src.frameId)) {
+      ytLastInfoDeliveryAt = Date.now();
+      const prev = ytPlayerRuntimeByFrame.get(src.frameId) || {};
+      const currentTime = typeof d.info.currentTime === 'number' ? d.info.currentTime : prev.currentTime;
+      const playerState = typeof d.info.playerState === 'number' ? d.info.playerState : prev.playerState;
+      const observedVideoId = (d.info.videoData && (d.info.videoData.video_id || d.info.videoData.videoId)) || getEmbedVideoId(src.iframe);
+      ytPlayerRuntimeByFrame.set(src.frameId, { currentTime, playerState, observedVideoId });
+      if (ytAutoEnabled && isYtAutoFrame && playerState === 0) scheduleNextYtAuto(ytAutoCurrentId, observedVideoId);
+      if (ytAutoEnabled && isYtAutoFrame && playerState === 1) {
+        ytAutoLastEndedId = null;
+        ensureYtAutoQueue(5);
+      }
+    }
+  }
+
+  if (!ytAutoEnabled || !ytAutoPlayerWindow) return;
+  if (!isYtAutoFrame && e.source !== ytAutoPlayerWindow) return;
+
+  if (d.event === 'onStateChange') {
+    const state = Number(d.info);
+    if (state === 1) {
+      ytAutoLastEndedId = null;
+      ensureYtAutoQueue(5);    /* playing */
+    }
+    if (state === 0 && Date.now() - ytLastInfoDeliveryAt > 1200) {
+      scheduleNextYtAuto(ytAutoCurrentId, getEmbedVideoId(src.iframe));    /* ended fallback */
+    }
+  }
+  if (d.event === 'onError') scheduleNextYtAuto(ytAutoCurrentId, getEmbedVideoId(src.iframe));
+});
+
+function renderYtResults(items) {
+  ytLastItems = items.slice(0, 8);
+  ytResults.innerHTML = '';
+  if (!items.length) {
+    const empty = document.createElement('button');
+    empty.className = 'yt-result';
+    empty.type = 'button';
+    empty.disabled = true;
+    empty.textContent = 'No se encontraron resultados';
+    ytResults.appendChild(empty);
+    ytResults.classList.add('visible');
+    return;
+  }
+  items.slice(0, 8).forEach((item, idx) => {
+    const b = document.createElement('button');
+    b.className = 'yt-result';
+    b.type = 'button';
+    b.textContent = item.title;
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      startYtThemePlayback(item, idx);
+    });
+    ytResults.appendChild(b);
+  });
+  ytResults.classList.add('visible');
+}
+
+ytInput.addEventListener('keydown', async e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  e.stopPropagation();
+  const first = ytResults.querySelector('.yt-result:not([disabled])');
+  if (first) first.click();
+});
+
+ytInput.addEventListener('input', () => {
+  const q = ytInput.value.trim();
+  clearTimeout(ytSearchTimer);
+  if (!q) {
+    clearYtResults();
+    return;
+  }
+  ytSearchTimer = setTimeout(async () => {
+    const reqId = ++ytSearchReqId;
+    try {
+      const r = await fetch(`/yt-search?q=${encodeURIComponent(q)}`);
+      const data = await r.json();
+      if (reqId !== ytSearchReqId) return;
+      renderYtResults(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      if (reqId !== ytSearchReqId) return;
+      clearYtResults();
+    }
+  }, 220);
+});
+
+ytInput.addEventListener('click', e => e.stopPropagation());
+ytResults.addEventListener('click', e => e.stopPropagation());
+
+/* Tools menu toggle */
+(function () {
+  const btn  = document.getElementById('tools-btn');
+  const menu = document.getElementById('tools-menu');
+  btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('visible'); });
+  document.addEventListener('click', () => menu.classList.remove('visible'));
+  menu.addEventListener('click', e => e.stopPropagation());
+})();
 
 /* =====================================================================
    Custom tooltips
@@ -2263,40 +2755,6 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   resetView();
   loadConfig();
 });
-
-document.getElementById('save-default-btn').addEventListener('click', saveAsDefault);
-window.showSaveDefault = () => { document.getElementById('save-default-btn').style.display = ''; };
-
-async function saveAsDefault() {
-  const btn = document.getElementById('save-default-btn');
-  const cfg = {
-    menu: document.body.classList.contains('bar-hidden') ? 'oculto' : 'visible',
-    framesInicial: frames.map(f => ({ url: f.url, device: f.device, x: f.x, y: f.y })),
-    textosInicial: texts.map(t => ({
-      text: t.text, x: t.x, y: t.y, w: t.w,
-      fontSize: t.fontSize, rotation: t.rotation || 0,
-    })),
-  };
-  try {
-    const res = await fetch('/save-config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cfg),
-    });
-    const result = await res.json();
-    if (result.ok) {
-      btn.textContent = '✓';
-      btn.style.color = '#7fff7f';
-      setTimeout(() => { btn.textContent = '★'; btn.style.color = ''; }, 1500);
-    } else {
-      btn.textContent = '!';
-      setTimeout(() => { btn.textContent = '★'; }, 1500);
-    }
-  } catch {
-    btn.textContent = '!';
-    setTimeout(() => { btn.textContent = '★'; }, 1500);
-  }
-}
 
 /* =====================================================================
    Resize + init
