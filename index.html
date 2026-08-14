@@ -754,6 +754,237 @@
 
     .blocked-link:hover { background: rgba(107, 143, 255, 0.12); }
 
+    .repo-editor-widget {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+      background: #0f1013;
+      color: rgba(255,255,255,0.88);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
+    .repo-editor-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .repo-editor-branch {
+      font-size: 11px;
+      color: rgba(170,215,255,0.9);
+      border: 1px solid rgba(120,179,255,0.35);
+      background: rgba(0,122,204,0.16);
+      border-radius: 6px;
+      padding: 3px 8px;
+    }
+    .repo-editor-remote {
+      min-width: 220px;
+      flex: 1;
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .repo-editor-connect {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .repo-editor-main {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+    }
+    .repo-editor-sidebar {
+      width: 280px;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+    .repo-editor-select {
+      width: 100%;
+      height: 34px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      font-size: 12px;
+      padding: 0 8px;
+      outline: none;
+    }
+    .repo-editor-filelist {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.28);
+    }
+    .repo-editor-file {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.82);
+      text-align: left;
+      font-size: 11px;
+      padding: 8px 9px;
+      cursor: pointer;
+      display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .repo-editor-file:hover,
+    .repo-editor-file.active {
+      background: rgba(99,132,255,0.16);
+      color: #fff;
+    }
+    .repo-editor-work {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+      min-height: 0;
+    }
+    .repo-editor-path {
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .repo-editor-editor-shell {
+      flex: 1;
+      min-height: 220px;
+      display: flex;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+    .repo-editor-gutter {
+      width: 48px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.35);
+      font-size: 11px;
+      line-height: 1.5;
+      text-align: right;
+      padding: 10px 8px 10px 0;
+      white-space: pre;
+      user-select: none;
+    }
+    .repo-editor-code {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .repo-editor-highlight {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      padding: 10px;
+      pointer-events: none;
+      white-space: pre;
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.88);
+      font-family: inherit;
+      overflow: hidden;
+    }
+    .repo-editor-textarea {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      resize: none;
+      border: none;
+      background: transparent;
+      color: transparent;
+      caret-color: #f0f0f0;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      font-family: inherit;
+      outline: none;
+      white-space: pre;
+      overflow: auto;
+      tab-size: 2;
+    }
+    .repo-editor-textarea::selection {
+      background: rgba(107, 143, 255, 0.28);
+      color: transparent;
+    }
+    .repo-token-keyword { color: #7ab8ff; }
+    .repo-token-string { color: #f3b46f; }
+    .repo-token-number { color: #8ad0a6; }
+    .repo-token-comment { color: rgba(255,255,255,0.34); font-style: italic; }
+    .repo-token-operator { color: #d6d6d6; }
+    .repo-token-tag { color: #71d4f7; }
+    .repo-token-attr { color: #e3c36f; }
+    .repo-token-punct { color: rgba(255,255,255,0.65); }
+    .repo-editor-lang {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-left: auto;
+    }
+    .repo-editor-commit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .repo-editor-input {
+      flex: 1;
+      min-width: 180px;
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      padding: 0 9px;
+      font-size: 12px;
+      outline: none;
+    }
+    .repo-editor-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .repo-editor-btn {
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.88);
+      padding: 0 10px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .repo-editor-btn:hover { background: rgba(255,255,255,0.13); }
+    /* .repo-editor-status {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.35);
+      color: rgba(255,255,255,0.82);
+      font-size: 11px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      padding: 9px;
+      overflow: auto;
+      min-height: 96px;
+    } */
+
     /* ── Tablet ──────────────────────────────────────────────── */
     .tablet-outer {
       width: 600px; height: 840px;
@@ -1313,6 +1544,10 @@
                autocomplete="off" spellcheck="false">
       </div>
       <div id="yt-search-results" class="yt-results"></div>
+      <button class="tool-item" id="open-repo-editor-btn">
+        <span class="tool-icon">⌘</span>
+        <span class="tool-label">Editor repo</span>
+      </button>
       <hr class="tool-sep">
       <button class="tool-item tool-danger" id="reset-btn">
         <span class="tool-icon">↺</span>
@@ -1349,6 +1584,7 @@
   <span class="hint"><kbd>L</kbd> — capas</span>
 </div>
 
+<script src="/widgets/repo-editor-widget.js"></script>
 <script>
 /* =====================================================================
    State
@@ -1512,13 +1748,33 @@ function isAllowedUrl(url) {
 function normalizeUrl(raw) {
   raw = raw.trim();
   if (!raw) return null;
+  if (raw.startsWith(REPO_EDITOR_WIDGET_URL)) return raw;
   // YouTube → convert to embed URL
   const yt = youtubeEmbedUrl(raw);
   if (yt) return yt;
   if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
-  try { new URL(raw); } catch { return null; }
+  let parsed;
+  try { parsed = new URL(raw); } catch { return null; }
   if (!isAllowedUrl(raw)) return null;
   return raw;
+}
+
+const REPO_EDITOR_WIDGET_URL = 'widget://repo-editor';
+const LEGACY_VSCODE_WIDGET_PREFIX = 'widget://vscode';
+const LEGACY_GIT_WIDGET_URL = 'widget://git-agent';
+
+function addRepoEditorFrame() {
+  const id  = idSeq++;
+  const nth = frames.length;
+  const dev = DEVICES.desktop;
+  const cx = (innerWidth  / 2 - T.x) / T.s - dev.outerW / 2 + nth * 28;
+  const cy = (innerHeight / 2 - T.y) / T.s - dev.outerH / 2 + nth * 28;
+  const data = { id, url: REPO_EDITOR_WIDGET_URL, device: 'desktop', x: cx, y: cy };
+  frames.push(data);
+  buildFrame(data);
+  saveState();
+  emptyEl.classList.add('hidden');
+  return data;
 }
 
 /* =====================================================================
@@ -1751,7 +2007,8 @@ function morphFrameDevice(fw, data, newDevice) {
 
 function buildFrame(data) {
   const { id, url, device = 'mobile' } = data;
-  const isYT = /youtube\.com\/embed/.test(url);
+  const isRepoEditorWidget = url === REPO_EDITOR_WIDGET_URL || url.startsWith(LEGACY_VSCODE_WIDGET_PREFIX) || url === LEGACY_GIT_WIDGET_URL;
+  const isYT = !isRepoEditorWidget && /youtube\.com\/embed/.test(url);
 
   /* wrapper */
   const fw = document.createElement('div');
@@ -1766,12 +2023,16 @@ function buildFrame(data) {
 
   const title = document.createElement('span');
   title.className = 'fw-title';
-  try {
-    const u = new URL(url);
-    const ytId = u.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
-    const ytQ  = u.searchParams.get('list');
-    title.textContent = ytId ? `▶ YouTube · ${ytId[1]}` : ytQ ? `🔍 ${ytQ}` : u.hostname;
-  } catch { title.textContent = url; }
+  if (isRepoEditorWidget) {
+    title.textContent = 'Editor repo · Files/Commit/Push';
+  } else {
+    try {
+      const u = new URL(url);
+      const ytId = u.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
+      const ytQ  = u.searchParams.get('list');
+      title.textContent = ytId ? `▶ YouTube · ${ytId[1]}` : ytQ ? `🔍 ${ytQ}` : u.hostname;
+    } catch { title.textContent = url; }
+  }
 
   /* per-frame device switcher */
   const devStrip = document.createElement('div');
@@ -1802,19 +2063,24 @@ function buildFrame(data) {
   openBtn.setAttribute('target', '_blank');
   openBtn.setAttribute('rel', 'noopener noreferrer');
   /* for YouTube show the watch URL, otherwise use the raw url */
-  try {
-    const u2 = new URL(url);
-    const ytId2 = u2.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
-    const ytQ2  = u2.searchParams.get('list');
-    openBtn.href = ytId2 ? `https://www.youtube.com/watch?v=${ytId2[1]}` :
-                   ytQ2  ? `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ2)}` :
-                   url;
-  } catch { openBtn.href = url; }
+  if (isRepoEditorWidget) {
+    openBtn.href = '#';
+    openBtn.style.display = 'none';
+  } else {
+    try {
+      const u2 = new URL(url);
+      const ytId2 = u2.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
+      const ytQ2  = u2.searchParams.get('list');
+      openBtn.href = ytId2 ? `https://www.youtube.com/watch?v=${ytId2[1]}` :
+                     ytQ2  ? `https://www.youtube.com/results?search_query=${encodeURIComponent(ytQ2)}` :
+                     url;
+    } catch { openBtn.href = url; }
+  }
   openBtn.addEventListener('click', e => e.stopPropagation());
 
   /* cast button – only shown in Chrome with Presentation API support */
   let castBtn = null;
-  if ('PresentationRequest' in window) {
+  if (!isRepoEditorWidget && 'PresentationRequest' in window) {
     let castUrl = url;
     try {
       const ytId3 = new URL(url).pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})/);
@@ -1843,84 +2109,96 @@ function buildFrame(data) {
   closeBtn.addEventListener('click', e => { e.stopPropagation(); removeFrame(id); });
   label.append(title, openBtn, ...(castBtn ? [castBtn] : []), devStrip, closeBtn);
 
-  /* iframe */
-  const iframe = document.createElement('iframe');
-  iframe.src   = url;
-  iframe.title = url;
-  if (isYT) {
-    iframe.setAttribute('allow',
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-    iframe.allowFullscreen = true;
-    iframe.addEventListener('load', () => {
-      if (!iframe.contentWindow) return;
-      iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), 'https://www.youtube.com');
-      iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onError'] }), 'https://www.youtube.com');
-      pollYouTubeRuntime();
+  let iframe = null;
+  let blocked = null;
+
+  if (!isRepoEditorWidget) {
+    /* iframe */
+    iframe = document.createElement('iframe');
+    iframe.src   = url;
+    iframe.title = url;
+    if (isYT) {
+      iframe.setAttribute('allow',
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.allowFullscreen = true;
+      iframe.addEventListener('load', () => {
+        if (!iframe.contentWindow) return;
+        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onStateChange'] }), 'https://www.youtube.com');
+        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'addEventListener', args: ['onError'] }), 'https://www.youtube.com');
+        pollYouTubeRuntime();
+      });
+    } else {
+      iframe.setAttribute('sandbox',
+        'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock');
+      iframe.setAttribute('allow',
+        'accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone');
+    }
+    iframe.setAttribute('loading', 'lazy');
+
+    /* blocked overlay */
+    blocked = document.createElement('div');
+    blocked.className = 'blocked';
+    if (isYT) {
+      const watchUrl = url.replace(/www\.youtube\.com\/embed\/([A-Za-z0-9_-]{11}).*/, 'www.youtube.com/watch?v=$1');
+      blocked.innerHTML = `
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="#ff0000" opacity="0.6">
+          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/>
+          <polygon points="9.7 15.5 15.8 12 9.7 8.5" fill="white"/>
+        </svg>
+        <p class="blocked-text" style="font-size:12px;line-height:1.6">
+          YouTube bloquea embeds desde<br><code style="font-size:10px;opacity:.6">file://</code> — serví la app por HTTP:
+        </p>
+        <code style="font-size:10px;color:rgba(255,255,255,.35);text-align:center;padding:6px 10px;background:rgba(255,255,255,.05);border-radius:6px;white-space:nowrap">node server.js</code>
+        <a class="blocked-link" href="${watchUrl}" target="_blank" rel="noopener noreferrer">
+          Ver en YouTube →
+        </a>`;
+    } else {
+      blocked.innerHTML = `
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
+             stroke="rgba(255,255,255,.7)" stroke-width="1.3">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+        </svg>
+        <p class="blocked-text">Este sitio no permite<br>mostrarse dentro de un frame</p>
+        <a class="blocked-link" href="${url}" target="_blank" rel="noopener noreferrer">
+          Abrir en nueva pestaña →
+        </a>`;
+    }
+
+    iframe.addEventListener('error', () => {
+      iframe.style.display = 'none';
+      blocked.classList.add('visible');
     });
-  } else {
-    iframe.setAttribute('sandbox',
-      'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock');
-    iframe.setAttribute('allow',
-      'accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone');
-  }
-  iframe.setAttribute('loading', 'lazy');
 
-  /* blocked overlay */
-  const blocked = document.createElement('div');
-  blocked.className = 'blocked';
-  if (isYT) {
-    const watchUrl = url.replace(/www\.youtube\.com\/embed\/([A-Za-z0-9_-]{11}).*/, 'www.youtube.com/watch?v=$1');
-    blocked.innerHTML = `
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="#ff0000" opacity="0.6">
-        <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8z"/>
-        <polygon points="9.7 15.5 15.8 12 9.7 8.5" fill="white"/>
-      </svg>
-      <p class="blocked-text" style="font-size:12px;line-height:1.6">
-        YouTube bloquea embeds desde<br><code style="font-size:10px;opacity:.6">file://</code> — serví la app por HTTP:
-      </p>
-      <code style="font-size:10px;color:rgba(255,255,255,.35);text-align:center;padding:6px 10px;background:rgba(255,255,255,.05);border-radius:6px;white-space:nowrap">node server.js</code>
-      <a class="blocked-link" href="${watchUrl}" target="_blank" rel="noopener noreferrer">
-        Ver en YouTube →
-      </a>`;
-  } else {
-    blocked.innerHTML = `
-      <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
-           stroke="rgba(255,255,255,.7)" stroke-width="1.3">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
-      </svg>
-      <p class="blocked-text">Este sitio no permite<br>mostrarse dentro de un frame</p>
-      <a class="blocked-link" href="${url}" target="_blank" rel="noopener noreferrer">
-        Abrir en nueva pestaña →
-      </a>`;
-  }
-
-  iframe.addEventListener('error', () => {
-    iframe.style.display = 'none';
-    blocked.classList.add('visible');
-  });
-
-  if (isYT) {
-    /* YouTube error 150/153 arrives via postMessage from the player */
-    const ytHandler = e => {
-      try {
-        const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-        const hasError =
-          (d && d.event === 'infoDelivery' && d.info && d.info.error) ||
-          (d && d.event === 'onError' && d.info);
-        if (hasError) {
-          iframe.style.display = 'none';
-          blocked.classList.add('visible');
-          window.removeEventListener('message', ytHandler);
-        }
-      } catch {}
-    };
-    window.addEventListener('message', ytHandler);
+    if (isYT) {
+      /* YouTube error 150/153 arrives via postMessage from the player */
+      const ytHandler = e => {
+        try {
+          const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+          const hasError =
+            (d && d.event === 'infoDelivery' && d.info && d.info.error) ||
+            (d && d.event === 'onError' && d.info);
+          if (hasError) {
+            iframe.style.display = 'none';
+            blocked.classList.add('visible');
+            window.removeEventListener('message', ytHandler);
+          }
+        } catch {}
+      };
+      window.addEventListener('message', ytHandler);
+    }
   }
 
   /* device shell */
   const shell = createDeviceShell(device);
-  attachFrameContent(shell, iframe, blocked);
+  if (isRepoEditorWidget) {
+    const host = getShellScreenHost(shell);
+    if (host && window.RepoEditorWidget && typeof window.RepoEditorWidget.mount === 'function') {
+      window.RepoEditorWidget.mount(host);
+    }
+  } else {
+    attachFrameContent(shell, iframe, blocked);
+  }
   fw.append(label, shell);
   world.appendChild(fw);
   { const _z = data.zOrder || ++zSeq; if (data.zOrder > zSeq) zSeq = data.zOrder; fw.style.zIndex = _z; }
@@ -2416,6 +2694,15 @@ document.getElementById('z-fit'  ).addEventListener('click', () => { resetView()
 })();
 
 document.getElementById('text-btn').addEventListener('click', () => addTextNode());
+document.getElementById('open-repo-editor-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  closeMenu();
+  const data = addRepoEditorFrame();
+  if (data) {
+    const dev = DEVICES[data.device] || DEVICES.desktop;
+    zoomToNewElement(data.x, data.y, dev.outerW, dev.outerH + 44, 1);
+  }
+});
 
 /* YouTube search: crea o refresca un frame de búsqueda */
 let ytSearchFrameId = null;

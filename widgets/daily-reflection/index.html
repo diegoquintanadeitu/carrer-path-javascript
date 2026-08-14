@@ -1,0 +1,235 @@
+<div id="app" style="
+  --ink: #2b2820;
+  --paper: #f6f3ec;
+  --line: #d8d2c2;
+  --accent: #5c6b4f;
+  font-family: 'Georgia', 'Iowan Old Style', serif;
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+  padding: 48px 20px;
+  box-sizing: border-box;
+"></div>
+
+<style>
+  * { box-sizing: border-box; }
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 400;
+    margin: 0 0 28px 0;
+    letter-spacing: -0.01em;
+  }
+  .date-label {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #8a8371;
+    margin-bottom: 8px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 18px;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: #fffdf9;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  textarea:focus {
+    border-color: var(--accent);
+  }
+  .row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  button {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  button:hover { opacity: 0.88; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  .status {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #8a8371;
+    margin-top: 8px;
+    min-height: 14px;
+  }
+
+  details.history {
+    margin-top: 44px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  summary {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+    outline: none;
+  }
+  summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .entries { margin-top: 20px; }
+  .entry {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry-date {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .entry-text {
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .empty {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #a19a86;
+    padding: 8px 0;
+  }
+</style>
+
+<script>
+(function () {
+  const root = document.getElementById("app");
+  root.innerHTML = `
+    <div class="wrap">
+      <div class="eyebrow">Diario</div>
+      <h1>Reflexión del día</h1>
+      <div class="date-label" id="dateLabel"></div>
+      <textarea id="textarea" placeholder="¿Qué te dejó el día de hoy?" aria-label="Reflexión del día"></textarea>
+      <div class="row">
+        <button id="saveBtn" disabled>Guardar</button>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+      <details class="history">
+        <summary id="summaryLabel">Historial</summary>
+        <div class="entries" id="entries"><div class="empty">Cargando…</div></div>
+      </details>
+    </div>
+  `;
+
+  const textarea = document.getElementById("textarea");
+  const saveBtn = document.getElementById("saveBtn");
+  const statusEl = document.getElementById("status");
+  const entriesEl = document.getElementById("entries");
+  const summaryEl = document.getElementById("summaryLabel");
+  const dateLabel = document.getElementById("dateLabel");
+
+  dateLabel.textContent = new Date().toLocaleDateString("es-AR", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric"
+  });
+
+  let entries = [];
+  let statusTimeout = null;
+
+  function flashStatus(msg) {
+    statusEl.textContent = msg;
+    if (statusTimeout) clearTimeout(statusTimeout);
+    statusTimeout = setTimeout(() => { statusEl.textContent = ""; }, 2000);
+  }
+
+  function renderEntries() {
+    summaryEl.textContent = `Historial${entries.length > 0 ? ` (${entries.length})` : ""}`;
+    if (entries.length === 0) {
+      entriesEl.innerHTML = '<div class="empty">Todavía no hay reflexiones guardadas.</div>';
+      return;
+    }
+    entriesEl.innerHTML = entries.map(e => `
+      <div class="entry">
+        <div class="entry-date">${escapeHtml(e.fecha)} · ${escapeHtml(e.hora)}</div>
+        <div class="entry-text">${escapeHtml(e.texto)}</div>
+      </div>
+    `).join("");
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function updateBtnState() {
+    saveBtn.disabled = textarea.value.trim().length === 0;
+  }
+
+  async function cargar() {
+    try {
+      const res = await window.storage.get("reflexiones:lista", false);
+      entries = res ? JSON.parse(res.value) : [];
+    } catch (e) {
+      entries = [];
+    }
+    renderEntries();
+  }
+
+  async function guardar() {
+    const trimmed = textarea.value.trim();
+    if (!trimmed) return;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Guardando…";
+    const nueva = {
+      texto: trimmed,
+      fecha: new Date().toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" }),
+      hora: new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }),
+    };
+    const nuevaLista = [nueva, ...entries];
+    try {
+      await window.storage.set("reflexiones:lista", JSON.stringify(nuevaLista), false);
+      entries = nuevaLista;
+      textarea.value = "";
+      renderEntries();
+      flashStatus("Guardado");
+    } catch (e) {
+      flashStatus("Error al guardar");
+    } finally {
+      saveBtn.textContent = "Guardar";
+      updateBtnState();
+    }
+  }
+
+  textarea.addEventListener("input", updateBtnState);
+  textarea.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") guardar();
+  });
+  saveBtn.addEventListener("click", guardar);
+
+  cargar();
+})();
+</script>

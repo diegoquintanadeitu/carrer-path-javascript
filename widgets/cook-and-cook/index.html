@@ -1,0 +1,188 @@
+<div id="app" style="
+  --ink: #2b2820;
+  --paper: #f6f3ec;
+  --line: #d8d2c2;
+  --accent: #b5502f;
+  font-family: 'Georgia', 'Iowan Old Style', serif;
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+  padding: 48px 20px;
+  box-sizing: border-box;
+"></div>
+
+<style>
+  * { box-sizing: border-box; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  .eyebrow {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  h1 { font-size: 28px; font-weight: 400; margin: 0 0 4px 0; letter-spacing: -0.01em; }
+  .clock {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #8a8371;
+    margin-bottom: 30px;
+  }
+
+  .slot-card {
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    padding: 20px 22px;
+    margin-bottom: 24px;
+  }
+  .slot-name {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .slot-desc {
+    font-size: 15px;
+    color: #5a5546;
+    line-height: 1.5;
+  }
+
+  .recipes { display: flex; flex-direction: column; gap: 14px; }
+  .recipe {
+    border: 1px solid var(--line);
+    padding: 16px 20px;
+    background: #fffdf9;
+    transition: border-color 0.15s ease;
+  }
+  .recipe:hover { border-color: var(--accent); }
+  .recipe-name { font-size: 18px; margin-bottom: 4px; }
+  .recipe-meta {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #8a8371;
+    margin-bottom: 8px;
+  }
+  .recipe-ing {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #4a4638;
+  }
+
+  .row { display: flex; justify-content: flex-end; margin-top: 20px; }
+  button {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  button:hover { opacity: 0.88; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+</style>
+
+<script>
+(function () {
+  const DB = {
+    madrugada: {
+      label: "Madrugada",
+      desc: "Poco y rápido — algo que no te desvele preparando.",
+      recetas: [
+        { nombre: "Tostada con palta y huevo", tiempo: "8 min", ing: "Pan, palta, huevo, sal, limón" },
+        { nombre: "Yogur con avena y miel", tiempo: "3 min", ing: "Yogur natural, avena, miel, canela" },
+        { nombre: "Té + banana con manteca de maní", tiempo: "5 min", ing: "Banana, manteca de maní, té" },
+      ],
+    },
+    desayuno: {
+      label: "Desayuno",
+      desc: "Energía para arrancar el día.",
+      recetas: [
+        { nombre: "Huevos revueltos con espinaca", tiempo: "10 min", ing: "Huevos, espinaca, manteca, sal" },
+        { nombre: "Panqueques de avena y banana", tiempo: "15 min", ing: "Avena, banana, huevo, canela" },
+        { nombre: "Tostadas francesas", tiempo: "12 min", ing: "Pan, huevo, leche, azúcar, canela" },
+      ],
+    },
+    almuerzo: {
+      label: "Almuerzo",
+      desc: "Algo completo para sostener la tarde.",
+      recetas: [
+        { nombre: "Bowl de arroz, pollo y verduras salteadas", tiempo: "25 min", ing: "Arroz, pollo, brócoli, morrón, salsa de soja" },
+        { nombre: "Ensalada tibia de lentejas", tiempo: "20 min", ing: "Lentejas, cebolla, morrón, aceite de oliva, limón" },
+        { nombre: "Milanesa al horno con puré", tiempo: "35 min", ing: "Milanesa, papa, leche, manteca" },
+      ],
+    },
+    merienda: {
+      label: "Merienda",
+      desc: "Un corte dulce o salado antes de la noche.",
+      recetas: [
+        { nombre: "Tostado de jamón y queso", tiempo: "8 min", ing: "Pan de molde, jamón, queso" },
+        { nombre: "Licuado de banana y avena", tiempo: "5 min", ing: "Banana, avena, leche, miel" },
+        { nombre: "Mate con budín casero", tiempo: "—", ing: "Yerba, budín" },
+      ],
+    },
+    cena: {
+      label: "Cena",
+      desc: "Algo liviano pero satisfactorio para cerrar el día.",
+      recetas: [
+        { nombre: "Tarta de zapallito", tiempo: "40 min", ing: "Zapallito, huevo, queso, tapa de tarta" },
+        { nombre: "Sopa de verduras con fideos", tiempo: "30 min", ing: "Zanahoria, apio, cebolla, caldo, fideos" },
+        { nombre: "Pizza casera individual", tiempo: "20 min", ing: "Pan árabe, salsa de tomate, muzzarella" },
+      ],
+    },
+  };
+
+  function getSlot(hour) {
+    if (hour >= 0 && hour < 6) return "madrugada";
+    if (hour >= 6 && hour < 11) return "desayuno";
+    if (hour >= 11 && hour < 15) return "almuerzo";
+    if (hour >= 15 && hour < 19) return "merienda";
+    return "cena";
+  }
+
+  function render() {
+    const now = new Date();
+    const hour = now.getHours();
+    const slotKey = getSlot(hour);
+    const slot = DB[slotKey];
+    const timeStr = now.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+
+    document.getElementById("app").innerHTML = `
+      <div class="wrap">
+        <div class="eyebrow">Recetario</div>
+        <h1>¿Qué cocino ahora?</h1>
+        <div class="clock">Son las ${timeStr}</div>
+
+        <div class="slot-card">
+          <div class="slot-name">${slot.label}</div>
+          <div class="slot-desc">${slot.desc}</div>
+        </div>
+
+        <div class="recipes">
+          ${slot.recetas.map(r => `
+            <div class="recipe">
+              <div class="recipe-name">${r.nombre}</div>
+              <div class="recipe-meta">${r.tiempo}</div>
+              <div class="recipe-ing">${r.ing}</div>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="row">
+          <button id="refreshBtn">Actualizar</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("refreshBtn").addEventListener("click", render);
+  }
+
+  render();
+})();
+</script>

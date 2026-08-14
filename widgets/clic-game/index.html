@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catch the Dot</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111827;
+      color: #fff;
+    }
+
+    .widget {
+      width: min(92vw, 520px);
+      padding: 18px;
+      border-radius: 20px;
+      background: #1f2937;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    h1 { margin: 0; font-size: 1.25rem; }
+    .stats { display: flex; gap: 10px; font-size: .9rem; }
+    .stat {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #374151;
+    }
+
+    #game {
+      position: relative;
+      height: 360px;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #0b1220;
+      border: 1px solid #374151;
+      cursor: crosshair;
+    }
+
+    #dot {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      display: none;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      background: #f59e0b;
+      box-shadow: 0 0 24px rgba(245,158,11,.65);
+      transform: translate(-50%, -50%);
+    }
+
+    #message {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 30px;
+      color: #cbd5e1;
+      pointer-events: none;
+    }
+
+    button#start {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #f59e0b;
+      color: #111827;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button#start:hover { filter: brightness(1.08); }
+  </style>
+</head>
+<body>
+  <main class="widget">
+    <header>
+      <h1>🎯 Catch the Dot</h1>
+      <div class="stats">
+        <span class="stat">Puntos: <b id="score">0</b></span>
+        <span class="stat">Tiempo: <b id="time">20</b>s</span>
+      </div>
+    </header>
+
+    <section id="game">
+      <button id="dot" aria-label="Atrapar punto"></button>
+      <div id="message">Presioná “Jugar” y atrapá el círculo tantas veces como puedas.</div>
+    </section>
+
+    <button id="start">Jugar</button>
+  </main>
+
+  <script>
+    const game = document.querySelector("#game");
+    const dot = document.querySelector("#dot");
+    const scoreEl = document.querySelector("#score");
+    const timeEl = document.querySelector("#time");
+    const message = document.querySelector("#message");
+    const start = document.querySelector("#start");
+
+    let score = 0;
+    let time = 20;
+    let timer = null;
+    let playing = false;
+
+    function moveDot() {
+      const padding = 28;
+      const x = padding + Math.random() * (game.clientWidth - padding * 2);
+      const y = padding + Math.random() * (game.clientHeight - padding * 2);
+      dot.style.left = x + "px";
+      dot.style.top = y + "px";
+    }
+
+    function endGame() {
+      playing = false;
+      clearInterval(timer);
+      dot.style.display = "none";
+      message.innerHTML = `<strong>Fin del juego 🎉<br>Conseguiste ${score} puntos.</strong>`;
+      message.style.display = "grid";
+      start.textContent = "Jugar de nuevo";
+    }
+
+    function startGame() {
+      score = 0;
+      time = 20;
+      playing = true;
+      scoreEl.textContent = score;
+      timeEl.textContent = time;
+      message.style.display = "none";
+      dot.style.display = "block";
+      start.textContent = "Reiniciar";
+      moveDot();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        time--;
+        timeEl.textContent = time;
+        if (time <= 0) endGame();
+      }, 1000);
+    }
+
+    dot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!playing) return;
+      score++;
+      scoreEl.textContent = score;
+      moveDot();
+    });
+
+    start.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
